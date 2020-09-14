@@ -60,7 +60,7 @@ print_entries() {
 
 cat > "${tmp}/content"
 if [ ! -s "${tmp}/content" ]; then
-	echo "${KOBUGI_DEST%.html}" > "${tmp}/content"
+	echo "<h1>${KOBUGI_PWD}</h1>" > "${tmp}/content"
 fi
 
 
