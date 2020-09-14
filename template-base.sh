@@ -26,16 +26,21 @@ add_local_res() {
 }
 
 add_topbar() {
-	[ "$KOBUGI_DEST" = "index.html" ] && return || true
-	
-	local file
-	file="${KOBUGI_DEST%.html}"
+	local -
+	if [ "$KOBUGI_DEST" = "index.html" ]; then
+		goup='<a href="../" class="tpl-goup">⇧ Go Up</a>'
+		down=''
+	else
+		goup='<a href="./" class="tpl-goup">⇧ Go Up</a>'
+		down="<a href=\"$KOBUGI_SRC\" download>⇩ Download</a>"
+	fi
+
+	down_url=""
 
 	cat <<- EOF
 	<nav class="tpl-top">
-	  <a href=".." class="tpl-goup">⇧</span>
-	  <span class="tpl-name"></span>
-	  <a href="$file" download>Original</a>
+	${goup}
+	${down}
 	</nav>
 	EOF
 }
