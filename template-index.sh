@@ -1,5 +1,5 @@
-#!/bin/dash
-set -xe
+#!/bin/bash
+set -e
 
 mapfile="$1"
 
@@ -17,46 +17,47 @@ _cleanup() { rm -rf "$tmp"; }
 # Data model
 #
 
-mkdir -p "${tmp}/desc"
+declare -A entryDesc
 set_entry_desc() {
-	echo -n "$2" > "${tmp}/desc/${1%/}"
+	# $1 = entry name
+	# $2 = description
+	entryDesc[$1]="$2"
 }
 get_entry_desc() {
-	if [ -e "${tmp}/desc/${1%/}" ]; then
-		cat "${tmp}/desc/${1%/}"
-	fi
+	# $1 = entry name
+	echo -n "${entryDesc[$1]}"
 }
 
-
-mkdir -p "${tmp}/altname"
-set_entry_altname() {
-	echo -n "$2" > "${tmp}/altname/${1%/}"
+declare -A entryDisp
+set_entry_dispname() {
+	# $1 = entry name
+	# $2 = display name
+	entryDisp[$1]="$2"
 }
-get_entry_altname() {
-	if [ -e "${tmp}/altname/${1%/}" ]; then
-		cat "${tmp}/altname/${1%/}"
-	fi
+get_entry_dispname() {
+	# $1 = entry name
+	echo -n "${entryDisp[$1]}"
 }
 
-
-mkdir -p "${tmp}/skip"
+declare -A entrySkip
 set_skip_entry() {
-	touch "${tmp}/skip/${1%/}";
+	# $1 = entry name
+	entrySkip[$1]=1
 }
 should_skip_entry() {
-	[ -e "${tmp}/skip/${1%/}" ] || return 1
+	# $1 = entry name
+	[[ "${entrySkip[$1]}" -eq 1 ]] || return 1
 }
 
-
 touch "${tmp}/entries"
-append_item() {
+append_entry() {
 	echo "${1%/}" >> "${tmp}/entries"
 }
 append_content() {
 	echo '#content' >> "${tmp}/entries"
 }
-get_first_item() {
-	head -n1 "${tmp}/entries"
+print_entries() {
+	cat "${tmp}/entries"
 }
 
 
@@ -64,7 +65,7 @@ mark_content_printed() {
 	touch "${tmp}/content_printed"
 }
 is_content_printed() {
-	[ -e "${tmp}/content_printed" ] || return 1
+	[[ -e "${tmp}/content_printed" ]] || return 1
 }
 
 
@@ -73,7 +74,7 @@ is_content_printed() {
 #
 
 cat > "${tmp}/content"
-if [ ! -s "${tmp}/content" ]; then
+if [[ ! -s "${tmp}/content" ]]; then
 	echo "${KOBUGI_DEST%.html}" > "${tmp}/content"
 fi
 
@@ -82,21 +83,25 @@ fi
 # Define DSL and run the given ***map*** file
 #
 
-if [ -f "$mapfile" ]; then
+if [[ -f "$mapfile" ]]; then
 (
 	entry() {
+		# $1 = name
+		# $2 = display name
+		# $3 = description
+
 		local entry
-		if [ -d "${1%/}" ]; then
+		if [[ -d "${1%/}" ]]; then
 			entry="${1%/}/"
-		elif [ -f "$1.html" ]; then
+		elif [[ -f "$1.html" ]]; then
 			entry="$1.html"
 		else
 			return 1
 		fi
 
-		append_item "$entry"
-		[ -n "$2" ] && set_entry_altname "$entry" "$2" || true
-		[ -n "$3" ] && set_entry_desc "$entry" "$3" || true
+		append_entry "$entry"
+		[[ -n "$2" ]] && set_entry_dispname "$entry" "$2" || true
+		[[ -n "$3" ]] && set_entry_desc "$entry" "$3" || true
 	};
 
 	content() {
@@ -116,7 +121,7 @@ fi
 # Map-info post-processing
 #
 
-# Append all the files in the working directory to the item list.
+# Append all the files in the working directory to the entry list.
 # (Entries will be handled only once.)
 (
 	ls -d */ || true;
@@ -126,17 +131,17 @@ fi
 
 # split entries list
 (
-	while read item; do
-		[ "$item" = '#content' ] && break || true
-		[ "$item" = 'index.html' ] && continue || true
+	while read entry; do
+		[[ "$entry" = '#content' ]] && break || true
+		[[ "$entry" = 'index.html' ]] && continue || true
 
-		echo "$item"
+		echo "$entry"
 	done > "${tmp}/entries-above"
 
-	while read item; do
-		[ "$item" = '#content' ] && continue || true
-		[ "$item" = 'index.html' ] && continue || true
-		echo "$item"
+	while read entry; do
+		[[ "$entry" = '#content' ]] && continue || true
+		[[ "$entry" = 'index.html' ]] && continue || true
+		echo "$entry"
 	done > "${tmp}/entries-below"
 ) < "${tmp}/entries"
 
@@ -153,12 +158,12 @@ print_entry() {
 		&& return 0 \
 		|| set_skip_entry "$entry"
 
-	[ -d "$entry" ] \
+	[[ -d "$entry" ]] \
 		&& dir='idx-dir' \
 		|| dir=''
 
-	name="$(get_entry_altname "${entry}")"
-	if [ -z "$name" ]; then
+	name="$(get_entry_dispname "${entry}")"
+	if [[ -z "$name" ]]; then
 		name="${entry%.html}"
 	fi
 
@@ -176,7 +181,7 @@ print_entry() {
 
 print_entries() {
 	entries="${tmp}/entries-$1"
-	[ -s "$entries" ] || return 0
+	[[ -s "$entries" ]] || return 0
 
 	cat <<- EOF
 		<nav class="idx idx-$1">
