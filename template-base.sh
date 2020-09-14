@@ -21,12 +21,8 @@ esac
 
 
 add_local_res() {
-	if [ -f local.css ]; then
-		echo '  <link rel="stylesheet" href="local.css" />'
-	fi
-	if [ -f local.js ]; then
-		echo '  <script src="local.js"></script>'
-	fi
+	[ -f local.css ] && echo '  <link rel="stylesheet" href="local.css" />' || true
+	[ -f local.js ] && echo '  <script src="local.js"></script>' || true
 }
 
 add_topbar() {
@@ -35,15 +31,13 @@ add_topbar() {
 	local file
 	file="${KOBUGI_DEST%.html}"
 
-	cat << EOF | cut -b5-
-    <nav class="tpl-top">
-	  $(
-        echo '<a href=".." class="tpl-goup">⇧</span>'
-      )
-      <span class="tpl-name"></span>
-      <a href="$file" download>Original</a>
-    </nav>
-EOF
+	cat <<- EOF
+	<nav class="tpl-top">
+	  <a href=".." class="tpl-goup">⇧</span>
+	  <span class="tpl-name"></span>
+	  <a href="$file" download>Original</a>
+	</nav>
+	EOF
 }
 
 
@@ -59,11 +53,7 @@ $(add_local_res)
 
 <body>
 $(add_topbar)
-
-<div class="tpl-content">
 $(cat)
-</div>
-
 </body>
 </html>
 EOF

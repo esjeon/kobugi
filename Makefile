@@ -3,7 +3,7 @@
 
 ### Paths
 
-SELF = $(firstword $(MAKEFILE_LIST))
+SELF := $(firstword $(MAKEFILE_LIST))
 SELFDIR = $(shell dirname $(realpath $(SELF)))
 ROOT = $(realpath $(shell dirname "$(SELF)"))
 RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
@@ -11,50 +11,70 @@ RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 MAKESELF = make -f "$(SELF)"
 
 
-### Tools
-
-TEMPLATE = $(SELFDIR)/template.sh
-GENINDEX = $(SELFDIR)/genindex.sh
-HIGHLIGHT = highlight --line-numbers --anchors --no-doc --enclose-pre
-
-KOBUGI_ENV_RECIPE = \
-	KOBUGI_ROOT="$(ROOT)" \
-	KOBUGI_PWD="$(RELPWD)" \
-	KOBUGI_DEST="$@" \
-
-HIGHLIGHT_RECIPE = \
-	$(HIGHLIGHT) -o "$@" "$<"
-
-GENINDEX_RECIPE = $(KOBUGI_ENV_RECIPE) $(GENINDEX)
-TEMPLATE_RECIPE = $(KOBUGI_ENV_RECIPE) $(TEMPLATE)
-
-
 ### Files
+#
+# There are two types of files in Kobugi: Page and View.
+#
+#   - "Page" files are markup files that needs to be converted to HTML. During
+#   conversion, they lose their extension (e.g. hello.md -> hello.html)
+#
+#   - "View" files are something that can be "viewed" online, as long as there
+#   are recipes. View files retain their extension during conversion (e.g.
+#   hello.c -> hello.c.html)
+#
+
+PAT_PAGE := *.md *.run *.htm
+PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
+PAT_VIEW := $(PAT_CODE)
+PAT_EXCLUDE := local.% global.%
+
+SRC_PAGE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_PAGE)))
+SRC_VIEW = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_VIEW)))
+
+DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_VIEW))
+DEST_SANS_INDEX = $(filter-out index.html, $(DEST))
+
+OPT_INDEXDOC = $(firstword $(wildcard $(subst *,index,$(PAT_PAGE))))
+OPT_INDEXMAP = $(wildcard index.map)
 
 SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
-DOCU_PATTERN += *.md *.run *.htm
-VIEW_PATTERN += *.c *.js *.css *.sh Makefile *.mk
-VIEW_EXCLUDE += local.% global.%
 
-SRC_PAGE = $(wildcard $(DOCU_PATTERN))
-SRC_VIEW = $(filter-out $(VIEW_EXCLUDE), $(wildcard $(VIEW_PATTERN)))
+### Tools
 
-OPT_INDEXMAP = $(wildcard ./index.map)
+TPL_BASE = $(SELFDIR)/template-base.sh
+TPL_INDEX = $(SELFDIR)/template-index.sh
 
-DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_VIEW))
-DEST_INDEX = $(filter index.html, $(DEST))
-DEST_PAGE  = $(filter-out index.html, $(DEST))
+define KOBUGI_ENV_RECIPE
+KOBUGI_ROOT="$(ROOT)" \
+KOBUGI_PWD="$(RELPWD)" \
+KOBUGI_SRC="$<" \
+KOBUGI_DEST="$@"
+endef
+
+define BASE_RECIPE
+$(KOBUGI_ENV_RECIPE) $(TPL_BASE)
+endef
+
+define HIGHLIGHT_RECIPE
+highlight --line-numbers --anchors --no-doc --enclose-pre "$<" |\
+$(BASE_RECIPE)
+endef
+
+define INDEX_RECIPE
+$(KOBUGI_ENV_RECIPE) $(TPL_INDEX) index.map |\
+$(BASE_RECIPE)
+endef
 
 
 ### Commands
 
 all: $(SUBDIR)
-	$(MAKESELF) gen-page
+	$(MAKESELF) gen-sans-index
 	$(MAKESELF) gen-index
 
 clean: $(SUBDIR)
-	rm -f *.html *.htmp
+	rm -f *.html
 
 vars:
 	@echo "SELF    = $(SELF)"
@@ -64,14 +84,19 @@ vars:
 	@echo
 	@echo "SUBDIR = $(SUBDIR)"
 	@echo
+	@echo "PAT_PAGE    = $(PAT_PAGE)"
+	@echo "PAT_CODE    = $(PAT_CODE)"
+	@echo "PAT_VIEW    = $(PAT_VIEW)"
+	@echo "PAT_EXCLUDE = $(PAT_EXCLUDE)"
+	@echo
 	@echo "SRC_PAGE = $(SRC_PAGE)"
 	@echo "SRC_VIEW = $(SRC_VIEW)"
 	@echo
-	@echo "OPT_INDEXMAP = $(OPT_INDEXMAP)"
+	@echo "DEST = $(DEST)"
+	@echo "DEST_SANS_INDEX = $(DEST_SANS_INDEX)"
 	@echo
-	@echo "DEST       = $(DEST)"
-	@echo "DEST_INDEX = $(DEST_INDEX)"
-	@echo "DEST_PAGE  = $(DEST_PAGE)"
+	@echo "OPT_INDEXDOC = $(OPT_INDEXDOC)"
+	@echo "OPT_INDEXMAP = $(OPT_INDEXMAP)"
 
 $(SUBDIR)::
 	make -C "$@" -f "../$(SELF)" $(MAKECMDGOALS)
@@ -79,29 +104,25 @@ $(SUBDIR)::
 
 ### Internal Commands
 
-gen-page: $(DEST_PAGE)
+gen-sans-index: $(DEST_SANS_INDEX)
 
 gen-index:
-	[ -z "$(DEST_INDEX)" ] && touch -r . index.htmp || true
+	[ ! -f "index.htmp" ] && touch index.htmp || true
 	$(MAKESELF) index.html
 	rm -f index.htmp
 
 
-### Recipes
+### Recipe - Index
 
 .INTERMEDIATE: index.htmp
-index.html: index.htmp index.idxhtmp $(OPT_INDEXMAP) $(TEMPLATE) $(GENINDEX)
-	cat index.idxhtmp | $(TEMPLATE_RECIPE)
+index.html: index.htmp $(OPT_INDEXMAP)
+	cat index.htmp | $(INDEX_RECIPE)
 
-.INTERMEDIATE: index.idxhtmp
-index.idxhtmp: index.htmp $(GENINDEX)
-	cat index.htmp | $(GENINDEX_RECIPE) $(OPT_INDEXMAP) > index.idxhtmp
 
-%.html: %.htmp $(TEMPLATE)
-	cat "$<" | $(TEMPLATE_RECIPE)
+### Recipe - Page
 
-%.htmp: %.run
-	"./$<" > "$@"
+%.html: %.htmp
+	cat "$<" | $(BASE_RECIPE)
 
 %.htmp: %.htm
 	cp -l "$<" "$@"
@@ -109,23 +130,17 @@ index.idxhtmp: index.htmp $(GENINDEX)
 %.htmp: %.md
 	cmark-gfm "$<" > "$@"
 
+%.htmp: %.run
+	$(KOBUGI_ENV_RECIPE) ./"$<" > "$@"
 
-%.c.htmp: %.c
-	$(HIGHLIGHT_RECIPE)
 
-%.css.htmp: %.css
-	$(HIGHLIGHT_RECIPE)
+### Recipe - View
 
-%.js.htmp: %.js
-	$(HIGHLIGHT_RECIPE)
+define HIGHLIGHT_TARGET
+$(1).html: $(1)
+	$$(HIGHLIGHT_RECIPE)
+endef
 
-%.sh.htmp: %.sh
-	$(HIGHLIGHT_RECIPE)
-
-%.mk.htmp: %.mk
-	$(HIGHLIGHT_RECIPE)
-
-.INTERMEDIATE: Makefile.htmp
-Makefile.htmp: Makefile
-	$(HIGHLIGHT_RECIPE)
+$(foreach ext, $(subst *,%,$(PAT_CODE)),\
+	$(eval $(call HIGHLIGHT_TARGET,$(ext))))
 

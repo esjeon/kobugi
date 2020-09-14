@@ -85,9 +85,18 @@ fi
 if [ -f "$mapfile" ]; then
 (
 	entry() {
-		append_item "$1"
-		[ -n "$2" ] && set_entry_altname "$1" "$2" || true
-		[ -n "$3" ] && set_entry_desc "$1" "$3" || true
+		local entry
+		if [ -d "${1%/}" ]; then
+			entry="${1%/}/"
+		elif [ -f "$1.html" ]; then
+			entry="$1.html"
+		else
+			return 1
+		fi
+
+		append_item "$entry"
+		[ -n "$2" ] && set_entry_altname "$entry" "$2" || true
+		[ -n "$3" ] && set_entry_desc "$entry" "$3" || true
 	};
 
 	content() {
@@ -103,7 +112,6 @@ if [ -f "$mapfile" ]; then
 )
 fi
 
-
 #
 # Map-info post-processing
 #
@@ -114,6 +122,7 @@ fi
 	ls -d */ || true;
 	ls *.html || true;
 ) >> "${tmp}/entries" 2>/dev/null
+
 
 # split entries list
 (
@@ -145,7 +154,7 @@ print_entry() {
 		|| set_skip_entry "$entry"
 
 	[ -d "$entry" ] \
-		&& dir=' idx-dir' \
+		&& dir='idx-dir' \
 		|| dir=''
 
 	name="$(get_entry_altname "${entry}")"
@@ -170,7 +179,7 @@ print_entries() {
 	[ -s "$entries" ] || return 0
 
 	cat <<- EOF
-		<nav class="idx-$1">
+		<nav class="idx idx-$1">
 	EOF
 
 	while read entry; do
