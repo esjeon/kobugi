@@ -111,7 +111,7 @@ fi
 (
 	ls -d */ || true;
 	ls *.html || true;
-) | sed 's/\/$//' >> "${tmp}/entries" 2>/dev/null
+) 2>/dev/null | sed 's/\/$//' >> "${tmp}/entries"
 
 # split entries list
 cat "${tmp}/entries" |
