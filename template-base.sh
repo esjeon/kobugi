@@ -43,8 +43,10 @@ add_topbar() {
 
 	cat <<- EOF
 	<nav class="tpl-top">
-	${goup}
-	${down}
+	  <div class="tpl-top-inner">
+	    ${goup}
+	    ${down}
+	  </div>
 	</nav>
 	EOF
 }
