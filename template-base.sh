@@ -28,7 +28,11 @@ add_local_res() {
 add_topbar() {
 	local -
 	if [ "$KOBUGI_DEST" = "index.html" ]; then
-		goup='<a href="../" class="tpl-goup">⇧ Go Up</a>'
+		if [ "$KOBUGI_PWD" = '/' ]; then
+			goup=''
+		else
+			goup='<a href="../" class="tpl-goup">⇧ Go Up</a>'
+		fi
 		down=''
 	else
 		goup='<a href="./" class="tpl-goup">⇧ Go Up</a>'
