@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/dash
 set -e
 
 mapfile="$1"
@@ -17,41 +17,34 @@ _cleanup() { rm -rf "$tmp"; }
 # Data model
 #
 
-declare -A entryDesc
-set_entry_desc() {
-	# $1 = entry name
-	# $2 = description
-	entryDesc[$1]="$2"
+map_init() {
+	# $1 = map name
+	mkdir -p "${tmp}/map-$1"
 }
-get_entry_desc() {
-	# $1 = entry name
-	echo -n "${entryDesc[$1]}"
+map_set() {
+	# $1 = map name
+	# $2 = key
+	# $3 = value
+	echo -n "$3" > "${tmp}/map-$1/$2"
 }
-
-declare -A entryDisp
-set_entry_dispname() {
-	# $1 = entry name
-	# $2 = display name
-	entryDisp[$1]="$2"
-}
-get_entry_dispname() {
-	# $1 = entry name
-	echo -n "${entryDisp[$1]}"
+map_get() {
+	# $1 = map name
+	# $2 = key
+	cat "${tmp}/map-$1/$2" 2>/dev/null || return 0
 }
 
-declare -A entrySkip
-set_skip_entry() {
-	# $1 = entry name
-	entrySkip[$1]=1
-}
+map_init desc
+map_init disp
+map_init skip
+
 should_skip_entry() {
 	# $1 = entry name
-	[[ "${entrySkip[$1]}" -eq 1 ]] || return 1
+	[ "$(map_get skip "$1")" = 1 ] || return 1
 }
 
 touch "${tmp}/entries"
 append_entry() {
-	echo "${1%/}" >> "${tmp}/entries"
+	echo "$1" >> "${tmp}/entries"
 }
 append_content() {
 	echo '#content' >> "${tmp}/entries"
@@ -61,20 +54,12 @@ print_entries() {
 }
 
 
-mark_content_printed() {
-	touch "${tmp}/content_printed"
-}
-is_content_printed() {
-	[[ -e "${tmp}/content_printed" ]] || return 1
-}
-
-
 #
 # Save STDIN to a file
 #
 
 cat > "${tmp}/content"
-if [[ ! -s "${tmp}/content" ]]; then
+if [ ! -s "${tmp}/content" ]; then
 	echo "${KOBUGI_DEST%.html}" > "${tmp}/content"
 fi
 
@@ -83,7 +68,7 @@ fi
 # Define DSL and run the given ***map*** file
 #
 
-if [[ -f "$mapfile" ]]; then
+if [ -f "$mapfile" ]; then
 (
 	entry() {
 		# $1 = name
@@ -91,17 +76,17 @@ if [[ -f "$mapfile" ]]; then
 		# $3 = description
 
 		local entry
-		if [[ -d "${1%/}" ]]; then
-			entry="${1%/}/"
-		elif [[ -f "$1.html" ]]; then
+		if [ -d "$1" ]; then
+			entry="${1%/}"
+		elif [ -f "$1.html" ]; then
 			entry="$1.html"
 		else
 			return 1
 		fi
 
 		append_entry "$entry"
-		[[ -n "$2" ]] && set_entry_dispname "$entry" "$2" || true
-		[[ -n "$3" ]] && set_entry_desc "$entry" "$3" || true
+		[ -n "$2" ] && map_set disp "$entry" "$2" || true
+		[ -n "$3" ] && map_set desc "$entry" "$3" || true
 	};
 
 	content() {
@@ -110,7 +95,7 @@ if [[ -f "$mapfile" ]]; then
 
 	## `ignore` makes the given entry excluded from the index
 	ignore() {
-		set_skip_entry "${1}.html"
+		map_set skip "$1.html" 1
 	};
 
 	. ./"$mapfile"
@@ -126,24 +111,24 @@ fi
 (
 	ls -d */ || true;
 	ls *.html || true;
-) >> "${tmp}/entries" 2>/dev/null
-
+) | sed 's/\/$//' >> "${tmp}/entries" 2>/dev/null
 
 # split entries list
+cat "${tmp}/entries" |
 (
 	while read entry; do
-		[[ "$entry" = '#content' ]] && break || true
-		[[ "$entry" = 'index.html' ]] && continue || true
+		[ "$entry" = '#content' ] && break || true
+		[ "$entry" = 'index.html' ] && continue || true
 
 		echo "$entry"
 	done > "${tmp}/entries-above"
 
 	while read entry; do
-		[[ "$entry" = '#content' ]] && continue || true
-		[[ "$entry" = 'index.html' ]] && continue || true
+		[ "$entry" = '#content' ] && continue || true
+		[ "$entry" = 'index.html' ] && continue || true
 		echo "$entry"
 	done > "${tmp}/entries-below"
-) < "${tmp}/entries"
+)
 
 
 #
@@ -151,23 +136,25 @@ fi
 #
 
 print_entry() {
+	# $1 = entry name
 	local -
-	entry="${1%/}"
+
+	entry="$1"
 
 	should_skip_entry "$entry" \
 		&& return 0 \
-		|| set_skip_entry "$entry"
+		|| map_set skip "$entry" 1
 
-	[[ -d "$entry" ]] \
+	[ -d "$entry" ] \
 		&& dir='idx-dir' \
 		|| dir=''
 
-	name="$(get_entry_dispname "${entry}")"
-	if [[ -z "$name" ]]; then
+	name="$(map_get disp "${entry}")"
+	if [ -z "$name" ]; then
 		name="${entry%.html}"
 	fi
 
-	desc="$(get_entry_desc "$entry")"
+	desc="$(map_get desc "$entry")"
 
 	cat <<- EOF
 		  <div class="idx-i ${dir}">
@@ -181,7 +168,7 @@ print_entry() {
 
 print_entries() {
 	entries="${tmp}/entries-$1"
-	[[ -s "$entries" ]] || return 0
+	[ -s "$entries" ] || return 0
 
 	cat <<- EOF
 		<nav class="idx idx-$1">
@@ -195,7 +182,6 @@ print_entries() {
 		</nav>
 	EOF
 }
-
 
 cat <<- EOF_PAGE
 	$(print_entries "above")
