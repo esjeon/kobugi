@@ -107,7 +107,7 @@ $(SUBDIR)::
 gen-sans-index: $(DEST_SANS_INDEX)
 
 gen-index:
-	[ ! -f "index.htmp" ] && touch index.htmp || true
+	[ -f "index.htmp" ] || touch -r . index.htmp
 	$(MAKESELF) index.html
 	rm -f index.htmp
 
