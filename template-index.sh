@@ -130,6 +130,12 @@ cat "${tmp}/entries" |
 	done > "${tmp}/entries-below"
 )
 
+# If the map doesn't specify, the index should go below the content
+if ! grep -q '#content' "${tmp}/entries"; then
+	mv "${tmp}/entries-above" "${tmp}/entries-below"
+	touch "${tmp}/entries-above"
+fi
+
 
 #
 # Generate the output
