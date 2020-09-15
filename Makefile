@@ -64,9 +64,7 @@ $(KOBUGI_ENV_RECIPE) $(TPL_BASE)
 endef
 
 define HIGHLIGHT_RECIPE
-highlight --replace-tabs=4 --no-doc --enclose-pre "$<" |\
-$(SELFDIR)/highlight-lineno.sh |\
-$(BASE_RECIPE)
+$(SELFDIR)/highlight.sh "$<" | $(BASE_RECIPE)
 endef
 
 define INDEX_RECIPE
