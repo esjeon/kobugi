@@ -52,6 +52,19 @@ SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 TPL_BASE = $(SELFDIR)/template-base.sh
 TPL_INDEX = $(SELFDIR)/template-index.sh
 
+ifeq ($(wildcard /usr/bin/tput),)
+define PROGRESS
+	@printf " [%3s] $@ <- $?\n"
+endef
+else
+	_B:=$(shell tput bold)
+	_R:=$(shell tput sgr0)
+	_U:=$(shell tput smul)
+define PROGRESS
+	@printf " $(_B)[%3s]$(_R) $(RELPWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
+endef
+endif
+
 define KOBUGI_ENV_RECIPE
 KOBUGI_ROOT="$(ROOT)" \
 KOBUGI_PWD="$(RELPWD)" \
@@ -122,6 +135,7 @@ gen-index: index.html
 .INTERMEDIATE: index.htmp
 .INTERMEDIATE: README.htmp
 index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP)
+	$(PROGRESS) IDX
 	case "x$(OPT_INDEXHTMP)" in \
 		xREADME.htmp) cp README.htmp index.htmp ;; \
 		x) touch -r . index.htmp ;; \
@@ -135,15 +149,19 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP)
 ### Recipe - Page
 
 %.html: %.htmp
+	$(PROGRESS) TPL
 	cat "$<" | $(BASE_RECIPE)
 
 %.htmp: %.htm
+	$(PROGRESS) DOC
 	cp -l "$<" "$@"
 
 %.htmp: %.md
+	$(PROGRESS) DOC
 	cmark-gfm "$<" > "$@"
 
 %.htmp: %.run
+	$(PROGRESS) DOC
 	$(KOBUGI_ENV_RECIPE) ./"$<" > "$@"
 
 
@@ -151,6 +169,7 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP)
 
 define HIGHLIGHT_TARGET
 $(1).html: $(1)
+	$$(PROGRESS) HGT
 	$$(HIGHLIGHT_RECIPE)
 endef
 
