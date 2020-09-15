@@ -1,4 +1,17 @@
 #!/bin/dash
+# template-index.sh - generates directory index content
+#
+# * Input
+#   - env KOBUGI_*: the Kobugi interface
+#   - stdin: index prose
+#   - $1: path to index map file (i.e index.map)
+#
+# * Output
+#   - stdout: generated index content
+#
+# * Related
+#   - */, *.html: links to local directories and pages
+#
 set -e
 
 mapfile="$1"

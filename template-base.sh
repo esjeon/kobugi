@@ -1,4 +1,20 @@
 #!/bin/dash
+# template-base.sh - The base plate for the entire site
+#
+# * Input
+#   - env KOBUGI_*: the Kobugi interface
+#   - stdin: page content
+#
+# * Output
+#   - stdout: generated page
+#
+# * Related
+#   - /global.css: site-global stylesheet
+#   - local.css, local.js: local stylesheet and script
+#   - SKOBUGI_SRC: link to original file
+#
+# This is the outer-most wrapper for any content in the site.
+#
 
 set -e
 
