@@ -38,7 +38,6 @@ SRC_VIEW = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_VIEW)))
 DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_VIEW))
 DEST_SANS_INDEX = $(filter-out index.html, $(DEST))
 
-OPT_INDEXDOC = $(firstword $(wildcard $(subst *,index,$(PAT_PAGE))))
 OPT_INDEXMAP = $(wildcard index.map)
 OPT_INDEXHTMP = $(firstword $(patsubst %.html,%.htmp,$(filter index.html README.html, $(DEST))))
 
@@ -112,8 +111,8 @@ vars:
 	@echo "DEST = $(DEST)"
 	@echo "DEST_SANS_INDEX = $(DEST_SANS_INDEX)"
 	@echo
-	@echo "OPT_INDEXDOC = $(OPT_INDEXDOC)"
-	@echo "OPT_INDEXMAP = $(OPT_INDEXMAP)"
+	@echo "OPT_INDEXMAP  = $(OPT_INDEXMAP)"
+	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
 
 $(SUBDIR)::
 	make -C "$@" -f "../$(SELF)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
