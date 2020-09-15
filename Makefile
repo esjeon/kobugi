@@ -77,7 +77,7 @@ all: $(SUBDIR)
 	$(MAKESELF) gen-index
 
 clean: $(SUBDIR)
-	rm -f *.html
+	rm -f *.html *.htmp
 
 vars:
 	@echo "SELF    = $(SELF)"
@@ -109,6 +109,7 @@ $(SUBDIR)::
 
 gen-sans-index: $(DEST_SANS_INDEX)
 
+.INTERMEDIATE: README.htmp
 gen-index: $(OPT_INDEXHTMP)
 	case "x$(OPT_INDEXHTMP)" in \
 		xindex.htmp) ;; \
@@ -116,7 +117,7 @@ gen-index: $(OPT_INDEXHTMP)
 		x) touch -r . index.htmp ;; \
 	esac
 	$(MAKESELF) index.html
-	rm -f index.htmp
+	rm -f index.htmp README.htmp
 
 
 ### Recipe - Index
