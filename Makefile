@@ -36,7 +36,7 @@ DEST_SANS_INDEX = $(filter-out index.html, $(DEST))
 
 OPT_INDEXDOC = $(firstword $(wildcard $(subst *,index,$(PAT_PAGE))))
 OPT_INDEXMAP = $(wildcard index.map)
-OPT_INDEXHTMP = $(patsubst %.html,%.htmp,$(filter index.html, $(DEST)))
+OPT_INDEXHTMP = $(firstword $(patsubst %.html,%.htmp,$(filter index.html README.html, $(DEST))))
 
 SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
@@ -108,7 +108,11 @@ $(SUBDIR)::
 gen-sans-index: $(DEST_SANS_INDEX)
 
 gen-index: $(OPT_INDEXHTMP)
-	[ -f "index.htmp" ] || touch -r . index.htmp
+	case "x$(OPT_INDEXHTMP)" in \
+		xindex.htmp) ;; \
+		xREADME.htmp) cp README.htmp index.htmp ;; \
+		x) touch -r . index.htmp ;; \
+	esac
 	$(MAKESELF) index.html
 	rm -f index.htmp
 
