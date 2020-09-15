@@ -1,5 +1,10 @@
 .POSIX:
 
+ifndef VERBOSE
+.SILENT:
+MAKE_NOPRINTDIR:=--no-print-directory
+endif
+
 -include local.mk
 
 ### Paths
@@ -9,7 +14,7 @@ SELFDIR = $(shell dirname $(realpath $(SELF)))
 ROOT = $(realpath $(shell dirname "$(SELF)"))
 RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
-MAKESELF = make -f "$(SELF)"
+MAKESELF = make -f "$(SELF)" $(MAKE_NOPRINTDIR)
 
 
 ### Files
@@ -102,7 +107,7 @@ vars:
 	@echo "OPT_INDEXMAP = $(OPT_INDEXMAP)"
 
 $(SUBDIR)::
-	make -C "$@" -f "../$(SELF)" $(MAKECMDGOALS)
+	make -C "$@" -f "../$(SELF)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
 
 
 ### Internal Commands
