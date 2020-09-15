@@ -51,7 +51,7 @@ TPL_INDEX = $(SELFDIR)/template-index.sh
 
 ifeq ($(wildcard /usr/bin/tput),)
 define PROGRESS
-	@printf " [%3s] $@ <- $?\n"
+	@printf " [%3s] $(RELPWD:%/=%)/$@: $?\n"
 endef
 else
 	_B:=$(shell tput bold)
