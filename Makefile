@@ -16,16 +16,6 @@ RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
 
 ### Files
-#
-# There are two types of files in Kobugi: Page and View.
-#
-#   - "Page" files are markup files that needs to be converted to HTML. During
-#   conversion, they lose their extension (e.g. hello.md -> hello.html)
-#
-#   - "View" files are something that can be "viewed" online, as long as there
-#   are recipes. View files retain their extension during conversion (e.g.
-#   hello.c -> hello.c.html)
-#
 
 PAT_PAGE := *.md *.run *.htm
 PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
