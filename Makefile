@@ -109,22 +109,22 @@ $(SUBDIR)::
 
 gen-sans-index: $(DEST_SANS_INDEX)
 
-.INTERMEDIATE: README.htmp
-gen-index: $(OPT_INDEXHTMP)
-	case "x$(OPT_INDEXHTMP)" in \
-		xindex.htmp) ;; \
-		xREADME.htmp) cp README.htmp index.htmp ;; \
-		x) touch -r . index.htmp ;; \
-	esac
-	$(MAKESELF) index.html
-	rm -f index.htmp README.htmp
+gen-index: index.html
 
 
 ### Recipe - Index
 
 .INTERMEDIATE: index.htmp
-index.html: index.htmp $(OPT_INDEXMAP)
+.INTERMEDIATE: README.htmp
+index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP)
+	case "x$(OPT_INDEXHTMP)" in \
+		xREADME.htmp) cp README.htmp index.htmp ;; \
+		x) touch -r . index.htmp ;; \
+	esac
 	cat index.htmp | $(INDEX_RECIPE)
+	case "x$(OPT_INDEXHTMP)" in \
+		x|xREADME.htmp) rm index.htmp ;; \
+	esac
 
 
 ### Recipe - Page
