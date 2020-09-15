@@ -87,7 +87,7 @@ endef
 
 ### Commands
 
-all: $(SUBDIR) $(DEST)
+all: $(SUBDIR) $(DEST) index.html
 
 clean: $(SUBDIR)
 	rm -f *.html *.htmp
