@@ -1,3 +1,4 @@
+.POSIX:
 
 -include local.mk
 
