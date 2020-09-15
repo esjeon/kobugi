@@ -14,8 +14,6 @@ SELFDIR = $(shell dirname $(realpath $(SELF)))
 ROOT = $(realpath $(shell dirname "$(SELF)"))
 RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
-MAKESELF = make -f "$(SELF)" $(MAKE_NOPRINTDIR)
-
 
 ### Files
 #
@@ -90,9 +88,7 @@ endef
 
 ### Commands
 
-all: $(SUBDIR)
-	$(MAKESELF) gen-sans-index
-	$(MAKESELF) gen-index
+all: $(SUBDIR) $(DEST)
 
 clean: $(SUBDIR)
 	rm -f *.html *.htmp
@@ -123,18 +119,11 @@ $(SUBDIR)::
 	make -C "$@" -f "../$(SELF)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
 
 
-### Internal Commands
-
-gen-sans-index: $(DEST_SANS_INDEX)
-
-gen-index: index.html
-
-
 ### Recipe - Index
 
 .INTERMEDIATE: index.htmp
 .INTERMEDIATE: README.htmp
-index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP)
+index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 	$(PROGRESS) IDX
 	case "x$(OPT_INDEXHTMP)" in \
 		xREADME.htmp) cp README.htmp index.htmp ;; \
