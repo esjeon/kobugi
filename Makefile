@@ -11,10 +11,10 @@ endif
 
 ### Paths
 
-SELF := $(firstword $(MAKEFILE_LIST))
-LIBPATH = $(shell dirname $(realpath $(SELF)))
-ROOT = $(realpath $(shell dirname "$(SELF)"))
-CWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
+KOBUGI_MK  := $(firstword $(MAKEFILE_LIST))
+KOBUGI_LIB  = $(shell dirname $(realpath $(KOBUGI_MK)))
+KOBUGI_ROOT = $(realpath $(shell dirname "$(KOBUGI_MK)"))
+KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 
 ### Configurables
@@ -30,13 +30,13 @@ PAT_EXCLUDE := $(DEFAULT_PAT_EXCLUDE)
 TEMPLATE := $(DEFAULT_TEMPLATE)
 
 TEMPLATE = explorer
-TEMPLATE_PATH = $(LIBPATH)/$(TEMPLATE)
+TEMPLATE_PATH = $(KOBUGI_LIB)/$(TEMPLATE)
 
 INDEX_RECIPE = cat > "$@"
 HIGHLIGHT_RECIPE = ( echo '<pre>'; cat "$<"; echo '</pre>' ) > "$@"
 BASE_RECIPE = cat "$<" > "$@"
 
-include $(ROOT)/config.mk
+include $(KOBUGI_ROOT)/config.mk
 -include local.mk
 include $(KOBUGI_LIB)/$(TEMPLATE)/template.mk
 
@@ -59,21 +59,22 @@ SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 ifeq ($(wildcard /usr/bin/tput),)
 define PROGRESS
-	@printf " [%3s] $(CWD:%/=%)/$@: $?\n"
+	@printf " [%3s] $(KOBUGI_CWD:%/=%)/$@: $?\n"
 endef
 else
 	_B:=$(shell tput bold)
 	_R:=$(shell tput sgr0)
 	_U:=$(shell tput smul)
 define PROGRESS
-	@printf " $(_B)[%3s]$(_R) $(CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
+	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
 endef
 endif
 
 define KOBUGI_ENV
-KOBUGI_ROOT="$(ROOT)" \
-KOBUGI_CWD="$(CWD)" \
-KOBUGI_LIBPATH="$(LIBPATH)" \
+KOBUGI_MK="$(KOBUGI_MK)" \
+KOBUGI_LIB="$(KOBUGI_LIB)" \
+KOBUGI_ROOT="$(KOBUGI_ROOT)" \
+KOBUGI_CWD="$(KOBUGI_CWD)" \
 KOBUGI_SRC="$<" \
 KOBUGI_DEST="$@"
 endef
@@ -86,18 +87,21 @@ all: $(SUBDIR) $(DEST) index.html
 clean: $(SUBDIR)
 	rm -f *.html *.htmp
 
-vars:
-	@echo "SELF    = $(SELF)"
-	@echo "LIBPATH = $(LIBPATH)"
-	@echo "ROOT    = $(ROOT)"
-	@echo "CWD     = $(CWD)"
-	@echo
-	@echo "SUBDIR = $(SUBDIR)"
-	@echo
+config:
 	@echo "PAT_PAGE    = $(PAT_PAGE)"
 	@echo "PAT_CODE    = $(PAT_CODE)"
 	@echo "PAT_EXCLUDE = $(PAT_EXCLUDE)"
+	@echo "TEMPLATE    = $(TEMPLATE)"
+
+vars:
+	@echo "This output is for debugging only."
 	@echo
+	@echo "KOBUGI_MK   = $(KOBUGI_MK)"
+	@echo "KOBUGI_LIB  = $(KOBUGI_LIB)"
+	@echo "KOBUGI_ROOT = $(KOBUGI_ROOT)"
+	@echo "KOBUGI_CWD  = $(KOBUGI_CWD)"
+	@echo
+	@echo "SUBDIR = $(SUBDIR)"
 	@echo "SRC_PAGE = $(SRC_PAGE)"
 	@echo "SRC_CODE = $(SRC_CODE)"
 	@echo
@@ -108,7 +112,7 @@ vars:
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
 
 $(SUBDIR)::
-	make -C "$@" -f "../$(SELF)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
+	make -C "$@" -f "../$(KOBUGI_MK)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
 
 
 ### Recipe - Index
