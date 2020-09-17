@@ -21,7 +21,7 @@ KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 DEFAULT_PAT_PAGE := *.md *.run *.htm
 DEFAULT_PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
-DEFAULT_PAT_EXCLUDE := local.% global.%
+DEFAULT_PAT_EXCLUDE := local.* global.*
 DEFAULT_TEMPLATE := explorer
 
 PAT_PAGE := $(DEFAULT_PAT_PAGE)
@@ -43,6 +43,7 @@ include $(KOBUGI_LIB)/$(TEMPLATE)/template.mk
 
 ### Files
 
+PAT_EXCLUDE := $(subst *,%,$(PAT_EXCLUDE))
 SRC_PAGE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_PAGE)))
 SRC_CODE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_CODE)))
 
