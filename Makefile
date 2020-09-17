@@ -10,7 +10,7 @@ endif
 ### Paths
 
 SELF := $(firstword $(MAKEFILE_LIST))
-SELFDIR = $(shell dirname $(realpath $(SELF)))
+LIBPATH = $(shell dirname $(realpath $(SELF)))
 ROOT = $(realpath $(shell dirname "$(SELF)"))
 RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
@@ -36,8 +36,8 @@ SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 ### Tools
 
-TPL_BASE = $(SELFDIR)/template-base.sh
-TPL_INDEX = $(SELFDIR)/template-index.sh
+TPL_BASE = $(LIBPATH)/template-base.sh
+TPL_INDEX = $(LIBPATH)/template-index.sh
 
 ifeq ($(wildcard /usr/bin/tput),)
 define PROGRESS
@@ -55,6 +55,7 @@ endif
 define KOBUGI_ENV_RECIPE
 KOBUGI_ROOT="$(ROOT)" \
 KOBUGI_PWD="$(RELPWD)" \
+KOBUGI_LIBPATH="$(LIBPATH)" \
 KOBUGI_SRC="$<" \
 KOBUGI_DEST="$@"
 endef
@@ -64,7 +65,7 @@ $(KOBUGI_ENV_RECIPE) $(TPL_BASE)
 endef
 
 define HIGHLIGHT_RECIPE
-$(SELFDIR)/highlight.sh "$<" | $(BASE_RECIPE)
+$(LIBPATH)/highlight.sh "$<" | $(BASE_RECIPE)
 endef
 
 define INDEX_RECIPE
@@ -82,7 +83,7 @@ clean: $(SUBDIR)
 
 vars:
 	@echo "SELF    = $(SELF)"
-	@echo "SELFDIR = $(SELFDIR)"
+	@echo "LIBPATH = $(LIBPATH)"
 	@echo "ROOT    = $(ROOT)"
 	@echo "RELPWD  = $(RELPWD)"
 	@echo
