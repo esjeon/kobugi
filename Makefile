@@ -12,7 +12,7 @@ endif
 SELF := $(firstword $(MAKEFILE_LIST))
 LIBPATH = $(shell dirname $(realpath $(SELF)))
 ROOT = $(realpath $(shell dirname "$(SELF)"))
-RELPWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
+CWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
 
 ### Files
@@ -41,20 +41,20 @@ TPL_INDEX = $(LIBPATH)/template-index.sh
 
 ifeq ($(wildcard /usr/bin/tput),)
 define PROGRESS
-	@printf " [%3s] $(RELPWD:%/=%)/$@: $?\n"
+	@printf " [%3s] $(CWD:%/=%)/$@: $?\n"
 endef
 else
 	_B:=$(shell tput bold)
 	_R:=$(shell tput sgr0)
 	_U:=$(shell tput smul)
 define PROGRESS
-	@printf " $(_B)[%3s]$(_R) $(RELPWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
+	@printf " $(_B)[%3s]$(_R) $(CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
 endef
 endif
 
 define KOBUGI_ENV_RECIPE
 KOBUGI_ROOT="$(ROOT)" \
-KOBUGI_PWD="$(RELPWD)" \
+KOBUGI_CWD="$(CWD)" \
 KOBUGI_LIBPATH="$(LIBPATH)" \
 KOBUGI_SRC="$<" \
 KOBUGI_DEST="$@"
@@ -85,7 +85,7 @@ vars:
 	@echo "SELF    = $(SELF)"
 	@echo "LIBPATH = $(LIBPATH)"
 	@echo "ROOT    = $(ROOT)"
-	@echo "RELPWD  = $(RELPWD)"
+	@echo "CWD     = $(CWD)"
 	@echo
 	@echo "SUBDIR = $(SUBDIR)"
 	@echo

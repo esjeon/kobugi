@@ -73,7 +73,7 @@ print_entries() {
 
 cat > "${tmp}/content"
 if [ ! -s "${tmp}/content" ]; then
-	echo "<h1>${KOBUGI_PWD}</h1>" > "${tmp}/content"
+	echo "<h1>${KOBUGI_CWD}</h1>" > "${tmp}/content"
 fi
 
 

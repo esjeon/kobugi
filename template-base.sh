@@ -18,7 +18,7 @@
 
 set -e
 
-if [ -z "$KOBUGI_PWD" ]; then
+if [ -z "$KOBUGI_CWD" ]; then
 	echo "This script can't run independently." >&2
 fi
 
@@ -28,11 +28,11 @@ cleanup() {
 	rm -f "$tmp"
 }
 
-case "$KOBUGI_PWD:$KOBUGI_DEST" in
+case "$KOBUGI_CWD:$KOBUGI_DEST" in
 	/:index.html) title="Hyunmu.am" ;;
 	/:*         ) title="/${KOBUGI_DEST} - Hyunmu.am" ;;
-	*:index.html) title="${KOBUGI_PWD}/ - Hyunmu.am" ;;
-	*:*         ) title="${KOBUGI_PWD}/${KOBUGI_DEST} - Hyunmu.am" ;;
+	*:index.html) title="${KOBUGI_CWD}/ - Hyunmu.am" ;;
+	*:*         ) title="${KOBUGI_CWD}/${KOBUGI_DEST} - Hyunmu.am" ;;
 esac
 
 
@@ -44,7 +44,7 @@ add_local_res() {
 add_topbar() {
 	local -
 	if [ "$KOBUGI_DEST" = "index.html" ]; then
-		if [ "$KOBUGI_PWD" = '/' ]; then
+		if [ "$KOBUGI_CWD" = '/' ]; then
 			goup=''
 		else
 			goup='<a href="../" class="tpl-goup">⇧ Go Up</a>'
