@@ -57,18 +57,14 @@ SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 ### Tools
 
-ifeq ($(wildcard /usr/bin/tput),)
-define PROGRESS
-	@printf " [%3s] $(KOBUGI_CWD:%/=%)/$@: $?\n"
-endef
-else
+ifneq "$(wildcard /usr/bin/tput)" ""
 	_B:=$(shell tput bold)
 	_R:=$(shell tput sgr0)
 	_U:=$(shell tput smul)
+endif
 define PROGRESS
 	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
 endef
-endif
 
 define KOBUGI_ENV
 KOBUGI_MK="$(KOBUGI_MK)" \
