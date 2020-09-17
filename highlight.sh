@@ -9,38 +9,13 @@ prefix="L"
 
 count=''
 
-(
-	highlight --replace-tabs=4 --no-doc --enclose-pre "$file"
-	echo
-) | \
-while read line; do
-	case "$line" in
-		'<pre '*)
-			echo "$line" | sed "
-				s/>/><span class='${class}' id='${prefix}1'>/
-				s/\$/<\/span>/
-			"
-			count=2
-			;;
-		'</pre>')
-			echo "$line"
-			count=''
-			;;
-		*'</pre>')
-			echo "$line" | sed "
-				s/^/<span class='${class}' id='${prefix}${count}'>/
-				s/<\/pre>/<\/span><\/pre>/
-			"
-			count=''
-			;;
-		*)
-			if [ -n "$count" ]; then
-				echo "<span class='${class}' id='${prefix}${count}'>${line}</span>"
-				count=$((count + 1))
-			else
-				echo "$line"
-			fi
-			;;
-	esac
-done
-
+highlight --replace-tabs=4 --no-doc --enclose-pre "$file" |
+cat -n |
+sed "$( cat <<- EOF
+	s/^\s*\([0-9]\+\)\t\(.*<pre[^>]*>\)\(.*\)$/\2<span class="${class}" id="${prefix}_\1">\3<\/span>/;
+	t;
+	s/^\s*\([0-9]\+\)\t\(.*\)<\\/pre>/<\\/span><\\/pre>/;
+	t;
+	s/^\s*\([0-9]\+\)\t\(.*\)$/<span class="${class}" id="${prefix}_\1">\2<\\/span>/
+EOF
+)"
