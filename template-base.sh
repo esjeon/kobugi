@@ -35,35 +35,52 @@ case "$KOBUGI_CWD:$KOBUGI_DEST" in
 	*:*         ) title="${KOBUGI_CWD}/${KOBUGI_DEST} - Hyunmu.am" ;;
 esac
 
-
-add_local_res() {
-	[ -f local.css ] && echo '  <link rel="stylesheet" href="local.css" />' || true
-	[ -f local.js ] && echo '  <script src="local.js"></script>' || true
-}
-
-add_topbar() {
-	local -
-	if [ "$KOBUGI_DEST" = "index.html" ]; then
-		if [ "$KOBUGI_CWD" = '/' ]; then
-			goup=''
-		else
-			goup='<a href="../" class="tpl-goup">⇧ Go Up</a>'
-		fi
-		down=''
-	else
-		goup='<a href="./" class="tpl-goup">⇧ Go Up</a>'
-		down="<a href=\"$KOBUGI_SRC\" download>⇩ Download</a>"
-	fi
-
-	down_url=""
+header() {
+	url_up=''
+	url_down=''
+	case "$KOBUGI_CWD:$KOBUGI_DEST" in
+		/:index.html) ;;
+		*:index.html) url_up='../' ;;
+		*)
+			url_up='./'
+			if [ -n "$KOBUGI_SRC" -a -f "$KOBUGI_SRC" ]; then
+				url_down="$KOBUGI_SRC"
+			fi
+			;;
+	esac
 
 	cat <<- EOF
-	<nav class="tpl-top">
-	  <div class="tpl-top-inner">
-	    ${goup}
-	    ${down}
+	<nav>
+	  <div class="HeaderLinks">
+	EOF
+
+	[ -n "$url_up" ] && cat <<- EOF
+	    <span class="LinkUp">
+	      <a href="$url_up">⇧ Up</a>
+	    </span
+	EOF
+
+	[ -n "$url_down" ] && cat <<- EOF
+	    <span class="LinkDown">
+	      <a href='$KOBUGI_SRC' download>⇩ Download</a>
+	    </span
+	EOF
+
+	cat <<- EOF
 	  </div>
 	</nav>
+	EOF
+}
+
+body () {
+	cat
+}
+
+footer() {
+	cat <<- EOF
+	<footer>
+	  <span>generated with Kobugi</span>
+	</footer>
 	EOF
 }
 
@@ -75,13 +92,28 @@ cat > "$tmp" << EOF
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>${title}</title>
-  <link rel="stylesheet" href="/global.css" />
-$(add_local_res)
+  <link rel="stylesheet" href="/global.css" />$(
+	[ ! -f local.css ] || echo '  <link rel="stylesheet" href="local.css" />'
+	[ ! -f local.js  ] || echo '  <script src="local.js"></script>'
+)
 </head>
 
-<body>
-$(add_topbar)
-$(cat)
+<body class="Kobugi">
+<div id="Body">
+
+<div id="Header">
+$(header)
+</div>
+
+<div id="Main">
+$(body)
+</div>
+
+<div id="Footer">
+$(footer)
+</div>
+
+</div>
 </body>
 </html>
 EOF
