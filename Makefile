@@ -19,28 +19,26 @@ CWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
 ### Configurables
 
+DEFAULT_PAT_PAGE := *.md *.run *.htm
+DEFAULT_PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
+DEFAULT_PAT_EXCLUDE := local.% global.%
+DEFAULT_TEMPLATE := explorer
+
+PAT_PAGE := $(DEFAULT_PAT_PAGE)
+PAT_CODE := $(DEFAULT_PAT_CODE)
+PAT_EXCLUDE := $(DEFAULT_PAT_EXCLUDE)
+TEMPLATE := $(DEFAULT_TEMPLATE)
+
+TEMPLATE = explorer
 TEMPLATE_PATH = $(LIBPATH)/$(TEMPLATE)
 
-define HIGHLIGHT_RECIPE
-$(LIBPATH)/highlight.sh "$<" | $(BASE_RECIPE)
-endef
+INDEX_RECIPE = cat > "$@"
+HIGHLIGHT_RECIPE = ( echo '<pre>'; cat "$<"; echo '</pre>' ) > "$@"
+BASE_RECIPE = cat "$<" > "$@"
 
 include $(ROOT)/config.mk
 -include local.mk
-# Site- and directory-wide config, which must provide:
-#  - PAT_PAGE
-#  - PAT_CODE
-#  - PAT_EXCLUDE
-#  - TEMPLATE
-#
-#  May provide:
-#  - TEMPLATE_DIR
-#  - HIGHLIGHT_RECIPE
-
-include $(LIBPATH)/$(TEMPLATE)/template.mk
-# Per-template config, which must provide:
-#  - BASE_RECIPE
-#  - INDEX_RECIPE
+include $(KOBUGI_LIB)/$(TEMPLATE)/template.mk
 
 
 ### Files
