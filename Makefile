@@ -1,11 +1,13 @@
 .POSIX:
 
+# force set the main target to `all`
+all:
+
 ifndef VERBOSE
 .SILENT:
 MAKE_NOPRINTDIR:=--no-print-directory
 endif
 
--include local.mk
 
 ### Paths
 
@@ -15,17 +17,38 @@ ROOT = $(realpath $(shell dirname "$(SELF)"))
 CWD = $(abspath $(CURDIR:$(ROOT)%=%)/)
 
 
+### Configurables
+
+TEMPLATE_PATH = $(LIBPATH)/$(TEMPLATE)
+
+define HIGHLIGHT_RECIPE
+$(LIBPATH)/highlight.sh "$<" | $(BASE_RECIPE)
+endef
+
+include $(ROOT)/config.mk
+-include local.mk
+# Site- and directory-wide config, which must provide:
+#  - PAT_PAGE
+#  - PAT_CODE
+#  - PAT_EXCLUDE
+#  - TEMPLATE
+#
+#  May provide:
+#  - TEMPLATE_DIR
+#  - HIGHLIGHT_RECIPE
+
+include $(LIBPATH)/$(TEMPLATE)/template.mk
+# Per-template config, which must provide:
+#  - BASE_RECIPE
+#  - INDEX_RECIPE
+
+
 ### Files
 
-PAT_PAGE := *.md *.run *.htm
-PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
-PAT_VIEW := $(PAT_CODE)
-PAT_EXCLUDE := local.% global.%
-
 SRC_PAGE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_PAGE)))
-SRC_VIEW = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_VIEW)))
+SRC_CODE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_CODE)))
 
-DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_VIEW))
+DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_CODE))
 DEST_SANS_INDEX = $(filter-out index.html, $(DEST))
 
 OPT_INDEXMAP = $(wildcard index.map)
@@ -35,9 +58,6 @@ SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 
 ### Tools
-
-TPL_BASE = $(LIBPATH)/template-base.sh
-TPL_INDEX = $(LIBPATH)/template-index.sh
 
 ifeq ($(wildcard /usr/bin/tput),)
 define PROGRESS
@@ -52,25 +72,12 @@ define PROGRESS
 endef
 endif
 
-define KOBUGI_ENV_RECIPE
+define KOBUGI_ENV
 KOBUGI_ROOT="$(ROOT)" \
 KOBUGI_CWD="$(CWD)" \
 KOBUGI_LIBPATH="$(LIBPATH)" \
 KOBUGI_SRC="$<" \
 KOBUGI_DEST="$@"
-endef
-
-define BASE_RECIPE
-$(KOBUGI_ENV_RECIPE) $(TPL_BASE)
-endef
-
-define HIGHLIGHT_RECIPE
-$(LIBPATH)/highlight.sh "$<" | $(BASE_RECIPE)
-endef
-
-define INDEX_RECIPE
-$(KOBUGI_ENV_RECIPE) $(TPL_INDEX) index.map |\
-$(BASE_RECIPE)
 endef
 
 
@@ -91,11 +98,10 @@ vars:
 	@echo
 	@echo "PAT_PAGE    = $(PAT_PAGE)"
 	@echo "PAT_CODE    = $(PAT_CODE)"
-	@echo "PAT_VIEW    = $(PAT_VIEW)"
 	@echo "PAT_EXCLUDE = $(PAT_EXCLUDE)"
 	@echo
 	@echo "SRC_PAGE = $(SRC_PAGE)"
-	@echo "SRC_VIEW = $(SRC_VIEW)"
+	@echo "SRC_CODE = $(SRC_CODE)"
 	@echo
 	@echo "DEST = $(DEST)"
 	@echo "DEST_SANS_INDEX = $(DEST_SANS_INDEX)"
@@ -139,7 +145,7 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 
 %.htmp: %.run
 	$(PROGRESS) DOC
-	$(KOBUGI_ENV_RECIPE) ./"$<" > "$@"
+	$(KOBUGI_ENV) ./"$<" > "$@"
 
 
 ### Recipe - View
