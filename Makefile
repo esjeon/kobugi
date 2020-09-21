@@ -9,12 +9,15 @@ MAKE_NOPRINTDIR:=--no-print-directory
 endif
 
 
-### Paths
+### Environments
 
-KOBUGI_MK  := $(firstword $(MAKEFILE_LIST))
-KOBUGI_LIB  = $(shell dirname $(realpath $(KOBUGI_MK)))
-KOBUGI_ROOT = $(realpath $(shell dirname "$(KOBUGI_MK)"))
-KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
+export KOBUGI_MK   := $(firstword $(MAKEFILE_LIST))
+export KOBUGI_LIB  := $(dir $(realpath $(KOBUGI_MK)))
+export KOBUGI_ROOT := $(realpath $(shell dirname "$(KOBUGI_MK)"))
+export KOBUGI_CWD  := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
+
+export KOBUGI_SRC  = $<
+export KOBUGI_DEST = $@
 
 
 ### Configurables
@@ -56,15 +59,6 @@ define PROGRESS
 	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
 endef
 
-define KOBUGI_ENV
-KOBUGI_MK="$(KOBUGI_MK)" \
-KOBUGI_LIB="$(KOBUGI_LIB)" \
-KOBUGI_ROOT="$(KOBUGI_ROOT)" \
-KOBUGI_CWD="$(KOBUGI_CWD)" \
-KOBUGI_SRC="$<" \
-KOBUGI_DEST="$@"
-endef
-
 
 ### Commands
 
@@ -82,11 +76,6 @@ config:
 vars:
 	@echo "This output is for debugging only."
 	@echo
-	@echo "KOBUGI_MK   = $(KOBUGI_MK)"
-	@echo "KOBUGI_LIB  = $(KOBUGI_LIB)"
-	@echo "KOBUGI_ROOT = $(KOBUGI_ROOT)"
-	@echo "KOBUGI_CWD  = $(KOBUGI_CWD)"
-	@echo
 	@echo "SUBDIR = $(SUBDIR)"
 	@echo "SRC_PAGE = $(SRC_PAGE)"
 	@echo "SRC_CODE = $(SRC_CODE)"
@@ -96,6 +85,10 @@ vars:
 	@echo
 	@echo "OPT_INDEXMAP  = $(OPT_INDEXMAP)"
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
+
+env:
+	@env | grep KOBUGI_
+	@echo
 
 $(SUBDIR)::
 	make -C "$@" -f "../$(KOBUGI_MK)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
@@ -129,7 +122,7 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 
 %.htmp: %.kbg
 	$(PROGRESS) DOC
-	$(KOBUGI_ENV) ./"$<" > "$@"
+	./"$<" > "$@"
 
 
 ### Recipe - View
