@@ -19,10 +19,6 @@ KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 ### Configurables
 
-PAT_PAGE := *.run *.htm
-PAT_EXCLUDE := local.* global.*
-
-TEMPLATE := explorer
 TEMPLATE_PATH = $(KOBUGI_LIB)/$(TEMPLATE)
 
 INDEX_RECIPE = cat > "$@"
