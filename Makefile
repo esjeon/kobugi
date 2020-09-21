@@ -127,7 +127,7 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 	$(PROGRESS) DOC
 	cp -l "$<" "$@"
 
-%.htmp: %.run
+%.htmp: %.kbg
 	$(PROGRESS) DOC
 	$(KOBUGI_ENV) ./"$<" > "$@"
 

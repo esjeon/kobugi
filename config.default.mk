@@ -1,5 +1,5 @@
 
-PAT_PAGE := *.run *.htm
+PAT_PAGE := *.kbg *.htm
 PAT_CODE :=
 PAT_EXCLUDE := local.* global.*
 
