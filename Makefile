@@ -19,7 +19,7 @@ KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 ### Configurables
 
-DEFAULT_PAT_PAGE := *.md *.run *.htm
+DEFAULT_PAT_PAGE := *.run *.htm
 DEFAULT_PAT_EXCLUDE := local.* global.*
 DEFAULT_TEMPLATE := explorer
 
@@ -135,10 +135,6 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 %.htmp: %.htm
 	$(PROGRESS) DOC
 	cp -l "$<" "$@"
-
-%.htmp: %.md
-	$(PROGRESS) DOC
-	cmark-gfm "$<" > "$@"
 
 %.htmp: %.run
 	$(PROGRESS) DOC
