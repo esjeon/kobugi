@@ -9,4 +9,6 @@ define MARKDOWN_RECIPE
 cmark "$<" > "$@"
 endef
 
-include $(KOBUGI_LIB)/gnu-highlight.mk
+define HIGHLIGHT_RECIPE
+$(KOBUGI_LIB)/gnu-highlight.sh "$<" | $(BASE_RECIPE)
+endef
