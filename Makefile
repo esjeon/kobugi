@@ -20,11 +20,7 @@ export KOBUGI_SRC  = $<
 export KOBUGI_DEST = $@
 
 
-### Configurables
-
-INDEX_RECIPE = cat > "$@"
-HIGHLIGHT_RECIPE = ( echo '<pre>'; cat "$<"; echo '</pre>' ) > "$@"
-BASE_RECIPE = cat "$<" > "$@"
+### Configs
 
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
