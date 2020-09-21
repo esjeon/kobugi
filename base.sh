@@ -11,7 +11,7 @@
 # * Related
 #   - /global.css: site-global stylesheet
 #   - local.css, local.js: local stylesheet and script
-#   - SKOBUGI_SRC: link to original file
+#   - SKOBUGI_INPUT: link to original file
 #
 # This is the outer-most wrapper for any content in the site.
 #
@@ -28,23 +28,23 @@ cleanup() {
 	rm -f "$tmp"
 }
 
-case "$KOBUGI_CWD:$KOBUGI_DEST" in
+case "$KOBUGI_CWD:$KOBUGI_OUTPUT" in
 	/:index.html) title="Hyunmu.am" ;;
-	/:*         ) title="/${KOBUGI_DEST} - Hyunmu.am" ;;
+	/:*         ) title="/${KOBUGI_OUTPUT} - Hyunmu.am" ;;
 	*:index.html) title="${KOBUGI_CWD}/ - Hyunmu.am" ;;
-	*:*         ) title="${KOBUGI_CWD}/${KOBUGI_DEST} - Hyunmu.am" ;;
+	*:*         ) title="${KOBUGI_CWD}/${KOBUGI_OUTPUT} - Hyunmu.am" ;;
 esac
 
 header() {
 	url_up=''
 	url_down=''
-	case "$KOBUGI_CWD:$KOBUGI_DEST" in
+	case "$KOBUGI_CWD:$KOBUGI_OUTPUT" in
 		/:index.html) ;;
 		*:index.html) url_up='../' ;;
 		*)
 			url_up='./'
-			if [ -n "$KOBUGI_SRC" -a -f "$KOBUGI_SRC" ]; then
-				url_down="$KOBUGI_SRC"
+			if [ -n "$KOBUGI_INPUT" -a -f "$KOBUGI_INPUT" ]; then
+				url_down="$KOBUGI_INPUT"
 			fi
 			;;
 	esac
@@ -62,7 +62,7 @@ header() {
 
 	[ -n "$url_down" ] && cat <<- EOF
 	    <span class="LinkDown">
-	      <a href='$KOBUGI_SRC' download>⇩ Download</a>
+	      <a href='$KOBUGI_INPUT' download>⇩ Download</a>
 	    </span
 	EOF
 
@@ -118,4 +118,4 @@ $(footer)
 </html>
 EOF
 
-mv "$tmp" "$KOBUGI_DEST"
+mv "$tmp" "$KOBUGI_OUTPUT"

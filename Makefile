@@ -16,8 +16,8 @@ export KOBUGI_LIB  := $(dir $(realpath $(KOBUGI_MK)))
 export KOBUGI_ROOT := $(realpath $(shell dirname "$(KOBUGI_MK)"))
 export KOBUGI_CWD  := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
-export KOBUGI_SRC  = $<
-export KOBUGI_DEST = $@
+export KOBUGI_INPUT  = $<
+export KOBUGI_OUTPUT = $@
 
 
 ### Configs
