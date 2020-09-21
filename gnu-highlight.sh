@@ -1,4 +1,15 @@
 #!/bin/dash
+# gnu-highlight.sh - A recipe script for `gnu-highlight` plugin for Kobugi.
+#
+# This script not only highlights the given code, but also inserts <span> tags
+# w/ line number IDs for hash(#) linking.
+#
+# Input:
+#   - $1: the path to a source code
+#
+# Output:
+#   - STDOUT: the highlighted code w/ line number tags.
+#
 
 set -e
 

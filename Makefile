@@ -20,12 +20,10 @@ KOBUGI_CWD  = $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 ### Configurables
 
 DEFAULT_PAT_PAGE := *.md *.run *.htm
-DEFAULT_PAT_CODE := *.c *.css *.js *.mk *.sh Makefile
 DEFAULT_PAT_EXCLUDE := local.* global.*
 DEFAULT_TEMPLATE := explorer
 
 PAT_PAGE := $(DEFAULT_PAT_PAGE)
-PAT_CODE := $(DEFAULT_PAT_CODE)
 PAT_EXCLUDE := $(DEFAULT_PAT_EXCLUDE)
 TEMPLATE := $(DEFAULT_TEMPLATE)
 
