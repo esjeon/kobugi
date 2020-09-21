@@ -1,7 +1,7 @@
 
-PAT_PAGE := *.kbg *.htm *.md
-PAT_CODE :=
-PAT_EXCLUDE := local.* global.*
+PAGE_PATTERN := *.kbg *.htm *.md
+CODE_PATTERN :=
+EXCLUDE_PATTERN := local.* global.*
 
 define BASE_RECIPE
 $(KOBUGI_LIB)/base.sh

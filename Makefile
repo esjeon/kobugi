@@ -32,15 +32,15 @@ include $(KOBUGI_ROOT)/kobugi.mk
 
 ### Files
 
-PAT_EXCLUDE := $(subst *,%,$(PAT_EXCLUDE))
-SRC_PAGE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_PAGE)))
-SRC_CODE = $(filter-out $(PAT_EXCLUDE), $(wildcard $(PAT_CODE)))
+EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
+PAGES = $(filter-out $(EXCLUDE_PATTERN), $(wildcard $(PAGE_PATTERN)))
+CODES = $(filter-out $(EXCLUDE_PATTERN), $(wildcard $(CODE_PATTERN)))
 
-DEST = $(addsuffix .html, $(basename $(SRC_PAGE)) $(SRC_CODE))
-DEST_SANS_INDEX = $(filter-out index.html, $(DEST))
+HTMLS = $(addsuffix .html, $(basename $(PAGES)) $(CODES))
+HTMLS_NOINDEX = $(filter-out index.html, $(HTMLS))
 
 OPT_INDEXMAP = $(wildcard index.map)
-OPT_INDEXHTMP = $(firstword $(patsubst %.html,%.htmp,$(filter index.html README.html, $(DEST))))
+OPT_INDEXHTMP = $(firstword $(patsubst %.html,%.htmp,$(filter index.html README.html, $(HTMLS))))
 
 SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
@@ -59,25 +59,25 @@ endef
 
 ### Commands
 
-all: $(SUBDIR) $(DEST) index.html
+all: $(SUBDIR) $(HTMLS) index.html
 
 clean: $(SUBDIR)
 	rm -f *.html *.htmp
 
 config:
-	@echo "PAT_PAGE    = $(PAT_PAGE)"
-	@echo "PAT_CODE    = $(PAT_CODE)"
-	@echo "PAT_EXCLUDE = $(PAT_EXCLUDE)"
+	@echo "PAGE_PATTERN    = $(PAGE_PATTERN)"
+	@echo "CODE_PATTERN    = $(CODE_PATTERN)"
+	@echo "EXCLUDE_PATTERN = $(EXCLUDE_PATTERN)"
 
 vars:
 	@echo "This output is for debugging only."
 	@echo
 	@echo "SUBDIR = $(SUBDIR)"
-	@echo "SRC_PAGE = $(SRC_PAGE)"
-	@echo "SRC_CODE = $(SRC_CODE)"
+	@echo "PAGES = $(PAGES)"
+	@echo "CODES = $(CODES)"
 	@echo
-	@echo "DEST = $(DEST)"
-	@echo "DEST_SANS_INDEX = $(DEST_SANS_INDEX)"
+	@echo "HTMLS = $(HTMLS)"
+	@echo "HTMLS_NOINDEX = $(HTMLS_NOINDEX)"
 	@echo
 	@echo "OPT_INDEXMAP  = $(OPT_INDEXMAP)"
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
@@ -94,7 +94,7 @@ $(SUBDIR)::
 
 .INTERMEDIATE: index.htmp
 .INTERMEDIATE: README.htmp
-index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
+index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(HTMLS_NOINDEX)
 	$(PROGRESS) IDX
 	case "x$(OPT_INDEXHTMP)" in \
 		xREADME.htmp) cp README.htmp index.htmp ;; \
@@ -133,6 +133,6 @@ $(1).html: $(1)
 	$$(HIGHLIGHT_RECIPE)
 endef
 
-$(foreach ext, $(subst *,%,$(PAT_CODE)),\
+$(foreach ext, $(subst *,%,$(CODE_PATTERN)),\
 	$(eval $(call HIGHLIGHT_TARGET,$(ext))))
 
