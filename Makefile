@@ -124,6 +124,10 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(DEST_SANS_INDEX)
 	$(PROGRESS) DOC
 	./"$<" > "$@"
 
+%.htmp: %.md
+	$(PROGRESS) MD
+	$(MARKDOWN_RECIPE)
+
 
 ### Recipe - View
 
