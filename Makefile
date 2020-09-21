@@ -25,7 +25,7 @@ INDEX_RECIPE = cat > "$@"
 HIGHLIGHT_RECIPE = ( echo '<pre>'; cat "$<"; echo '</pre>' ) > "$@"
 BASE_RECIPE = cat "$<" > "$@"
 
-include $(KOBUGI_ROOT)/config.mk
+include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 include $(KOBUGI_LIB)/$(TEMPLATE)/template.mk
 
