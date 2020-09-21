@@ -22,15 +22,12 @@ export KOBUGI_DEST = $@
 
 ### Configurables
 
-TEMPLATE_PATH = $(KOBUGI_LIB)/$(TEMPLATE)
-
 INDEX_RECIPE = cat > "$@"
 HIGHLIGHT_RECIPE = ( echo '<pre>'; cat "$<"; echo '</pre>' ) > "$@"
 BASE_RECIPE = cat "$<" > "$@"
 
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
-include $(KOBUGI_LIB)/$(TEMPLATE)/template.mk
 
 
 ### Files
@@ -71,7 +68,6 @@ config:
 	@echo "PAT_PAGE    = $(PAT_PAGE)"
 	@echo "PAT_CODE    = $(PAT_CODE)"
 	@echo "PAT_EXCLUDE = $(PAT_EXCLUDE)"
-	@echo "TEMPLATE    = $(TEMPLATE)"
 
 vars:
 	@echo "This output is for debugging only."

@@ -3,7 +3,13 @@ PAT_PAGE := *.kbg *.htm *.md
 PAT_CODE :=
 PAT_EXCLUDE := local.* global.*
 
-TEMPLATE := explorer
+define BASE_RECIPE
+$(KOBUGI_LIB)/base.sh
+endef
+
+define INDEX_RECIPE
+$(KOBUGI_LIB)/index.sh index.map | $(BASE_RECIPE)
+endef
 
 define MARKDOWN_RECIPE
 cmark "$<" > "$@"
