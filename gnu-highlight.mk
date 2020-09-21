@@ -8,7 +8,7 @@
 #
 
 PAT_CODE := $(PAT_CODE) $(addprefix *., \
-	cs css fs gdb go hs html ini java js json jsp jsx jl kt kts ldif lua \
+	cs css fs gdb go hs ini java js json jsp jsx jl kt kts ldif lua \
 	mk mpl m nim pl php rb scss sh sql ts tsx vim vue xml yaml \
 )
 PAT_CODE := $(PAT_CODE) Makefile Dockerfile
