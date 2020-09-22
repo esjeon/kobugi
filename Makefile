@@ -26,6 +26,13 @@ include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 
 
+### Config Adjustment
+
+ifeq "$(MAKELEVEL)" "0"
+EXCLUDE_PATTERN := $(EXCLUDE_PATTERN) kobugi.mk Makefile
+endif
+
+
 ### Files
 
 EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
