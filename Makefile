@@ -123,12 +123,12 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(HTMLS_NOINDEX)
 
 ### Recipe - View
 
-define HIGHLIGHT_TARGET
+define CODE_RULE
 $(1).html: $(1)
 	$$(PROGRESS) HGT
 	$$(HIGHLIGHT_RECIPE)
 endef
 
 $(foreach ext, $(subst *,%,$(CODE_PATTERN)),\
-	$(eval $(call HIGHLIGHT_TARGET,$(ext))))
+	$(eval $(call CODE_RULE,$(ext))))
 
