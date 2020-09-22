@@ -29,13 +29,13 @@ include $(KOBUGI_ROOT)/kobugi.mk
 ### Files
 
 EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
-PAGES = $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
-CODES = $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
+PAGES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
+CODES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
 
-HTMLS = $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
-OPT_INDEXHTMP = $(addsuffix .htmp,$(firstword $(wildcard $(INDEX))))
+HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
+OPT_INDEXHTMP := $(addsuffix .htmp,$(firstword $(wildcard $(INDEX))))
 
-SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
+SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 
 ### Tools
