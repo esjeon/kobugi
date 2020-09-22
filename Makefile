@@ -29,14 +29,11 @@ include $(KOBUGI_ROOT)/kobugi.mk
 ### Files
 
 EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
-PAGES = $(filter-out $(EXCLUDE_PATTERN), $(wildcard $(PAGE_PATTERN)))
-CODES = $(filter-out $(EXCLUDE_PATTERN), $(wildcard $(CODE_PATTERN)))
+PAGES = $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
+CODES = $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
 
-HTMLS = $(addsuffix .html, $(basename $(PAGES)) $(CODES))
-HTMLS_NOINDEX = $(filter-out index.html, $(HTMLS))
-
-OPT_INDEXMAP = $(wildcard index.map)
-OPT_INDEXHTMP = $(firstword $(patsubst %.html,%.htmp,$(filter index.html README.html, $(HTMLS))))
+HTMLS = $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
+OPT_INDEXHTMP = $(addsuffix .htmp,$(firstword $(wildcard $(INDEX))))
 
 SUBDIR = $(subst /,,$(shell ls -d */ 2>/dev/null))
 
@@ -64,6 +61,7 @@ config:
 	@echo "PAGE_PATTERN    = $(PAGE_PATTERN)"
 	@echo "CODE_PATTERN    = $(CODE_PATTERN)"
 	@echo "EXCLUDE_PATTERN = $(EXCLUDE_PATTERN)"
+	@echo "INDEX           = $(INDEX)"
 
 vars:
 	@echo "This output is for debugging only."
@@ -71,11 +69,7 @@ vars:
 	@echo "SUBDIR = $(SUBDIR)"
 	@echo "PAGES = $(PAGES)"
 	@echo "CODES = $(CODES)"
-	@echo
 	@echo "HTMLS = $(HTMLS)"
-	@echo "HTMLS_NOINDEX = $(HTMLS_NOINDEX)"
-	@echo
-	@echo "OPT_INDEXMAP  = $(OPT_INDEXMAP)"
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
 
 env:
@@ -88,18 +82,17 @@ $(SUBDIR)::
 
 ### Recipe - Index
 
-.INTERMEDIATE: index.htmp
-.INTERMEDIATE: README.htmp
-index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(HTMLS_NOINDEX)
+index.html: index.htmp | $(HTMLS)
 	$(PROGRESS) IDX
-	case "x$(OPT_INDEXHTMP)" in \
-		xREADME.htmp) cp README.htmp index.htmp ;; \
-		x) touch -r . index.htmp ;; \
-	esac
 	cat index.htmp | $(INDEX_RECIPE)
-	case "x$(OPT_INDEXHTMP)" in \
-		x|xREADME.htmp) rm index.htmp ;; \
-	esac
+
+.INTERMEDIATE: index.htmp $(OPT_INDEXHTMP)
+index.htmp: $(OPT_INDEXHTMP)
+	$(PROGRESS) IDX
+	if [ -n '$<' ]; \
+	then rm -f '$@' && cp -l '$<' '$@'; \
+	else touch -r . '$@'; \
+	fi
 
 
 ### Recipe - Page
@@ -108,15 +101,22 @@ index.html: $(OPT_INDEXHTMP) $(OPT_INDEXMAP) | $(HTMLS_NOINDEX)
 	$(PROGRESS) TPL
 	cat "$<" | $(BASE_RECIPE)
 
-%.htmp: %.htm
+define PAGE_RULE
+%.html: %.$(1).htmp
+	$$(PROGRESS) REN
+	cp -l "$$<" "$$@"
+endef
+$(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
+
+%.htm.htmp: %.htm
 	$(PROGRESS) DOC
 	cp -l "$<" "$@"
 
-%.htmp: %.kbg
+%.kbg.htmp: %.kbg
 	$(PROGRESS) DOC
 	./"$<" > "$@"
 
-%.htmp: %.md
+%.md.htmp: %.md
 	$(PROGRESS) MD
 	$(MARKDOWN_RECIPE)
 
