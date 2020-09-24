@@ -3,15 +3,14 @@
 #
 # * Input
 #   - env KOBUGI_*: the Kobugi interface
-#   - stdin: page content
+#   - ${KOBUGI_INPUT}: content
 #
 # * Output
-#   - stdout: generated page
+#   - ${KOBUGI_OUTPUT}: generated page
 #
 # * Related
 #   - /global.css: site-global stylesheet
 #   - local.css, local.js: local stylesheet and script
-#   - SKOBUGI_INPUT: link to original file
 #
 # This is the outer-most wrapper for any content in the site.
 #
@@ -73,7 +72,7 @@ header() {
 }
 
 body () {
-	cat
+	cat "$KOBUGI_INPUT"
 }
 
 footer() {

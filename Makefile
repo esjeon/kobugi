@@ -41,6 +41,7 @@ CODES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
 
 HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
 OPT_INDEXHTMP := $(addsuffix .htmp,$(firstword $(wildcard $(INDEX))))
+OPT_KOBUGIMAP := $(wildcard kobugimap)
 
 SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
 
@@ -89,29 +90,27 @@ $(SUBDIR)::
 
 ### Recipe - Index
 
-index.html: index.htmp | $(HTMLS)
+index.html: index.htmp
 	$(PROGRESS) IDX
-	cat index.htmp | $(INDEX_RECIPE)
+	$(BASE_RECIPE)
 
 .INTERMEDIATE: index.htmp $(OPT_INDEXHTMP)
-index.htmp: $(OPT_INDEXHTMP)
+index.htmp: KOBUGI_INPUT=$(OPT_INDEXHTMP)
+index.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
 	$(PROGRESS) IDX
-	if [ -n '$<' ]; \
-	then rm -f '$@' && cp -l '$<' '$@'; \
-	else touch -r . '$@'; \
-	fi
+	"$(KOBUGI_LIB)/genindex.sh"
 
 
 ### Recipe - Page
 
 %.html: %.htmp
 	$(PROGRESS) TPL
-	cat "$<" | $(BASE_RECIPE)
+	$(BASE_RECIPE)
 
 define PAGE_RULE
 %.html: %.$(1).htmp
 	$$(PROGRESS) REN
-	cp -l "$$<" "$$@"
+	$$(BASE_RECIPE)
 endef
 $(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
 
@@ -131,7 +130,8 @@ $(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
 ### Recipe - View
 
 define CODE_RULE
-$(1).html: $(1)
+.INTERMEDIATE: $(1).htmp
+$(1).htmp: $(1)
 	$$(PROGRESS) HGT
 	$$(HIGHLIGHT_RECIPE)
 endef

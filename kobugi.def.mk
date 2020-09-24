@@ -10,7 +10,7 @@ $(KOBUGI_LIB)/base.sh
 endef
 
 define INDEX_RECIPE
-$(KOBUGI_LIB)/index.sh index.map | $(BASE_RECIPE)
+$(KOBUGI_LIB)/index.sh
 endef
 
 define MARKDOWN_RECIPE
@@ -18,5 +18,5 @@ cmark "$<" > "$@"
 endef
 
 define HIGHLIGHT_RECIPE
-$(KOBUGI_LIB)/gnu-highlight.sh "$<" | $(BASE_RECIPE)
+$(KOBUGI_LIB)/gnu-highlight.sh
 endef
