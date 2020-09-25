@@ -9,10 +9,6 @@ define BASE_RECIPE
 $(KOBUGI_LIB)/base.sh
 endef
 
-define INDEX_RECIPE
-$(KOBUGI_LIB)/index.sh
-endef
-
 define MARKDOWN_RECIPE
 cmark "$<" > "$@"
 endef
