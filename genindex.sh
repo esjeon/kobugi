@@ -65,8 +65,18 @@ print_rest() {
 
 {
 	if [ -f "$KOBUGI_INPUT" ]; then
-		cat "$KOBUGI_INPUT"
+		cat <<- EOF
+			<div id="IndexHeader">
+			$(cat "$KOBUGI_INPUT")
+			</div>
+
+		EOF
 	fi
+
+	cat <<- EOF
+	<div id="IndexEntries">
+	<nav>
+	EOF
 
 	if [ -f kobugimap ]; then
 		cat kobugimap | while IFS="$tab" read -r arg0 arg1 arg2 arg3 arg4; do
@@ -110,4 +120,9 @@ print_rest() {
 	else
 		print_rest
 	fi
+
+	cat <<- EOF
+	</nav>
+	</div>
+	EOF
 } > "${KOBUGI_OUTPUT}"
