@@ -10,7 +10,7 @@ $(KOBUGI_LIB)/base.sh
 endef
 
 define MARKDOWN_RECIPE
-cmark "$<" > "$@"
+{ echo '<content>'; cmark "$<"; echo '</content>' } > "$@"
 endef
 
 define HIGHLIGHT_RECIPE
