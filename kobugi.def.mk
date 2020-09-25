@@ -14,5 +14,5 @@ define MARKDOWN_RECIPE
 endef
 
 define HIGHLIGHT_RECIPE
-$(KOBUGI_LIB)/gnu-highlight.sh
+$(KOBUGI_LIB)/highlight.sh
 endef
