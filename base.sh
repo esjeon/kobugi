@@ -38,7 +38,7 @@ header() {
 	url_up=''
 	url_down=''
 	case "$KOBUGI_CWD:$KOBUGI_OUTPUT" in
-		/:index.html) ;;
+		/:index.html) return ;;
 		*:index.html) url_up='../' ;;
 		*)
 			url_up='./'
@@ -49,25 +49,25 @@ header() {
 	esac
 
 	cat <<- EOF
+	<div id="HeaderLinks">
 	<nav>
-	  <div class="HeaderLinks">
 	EOF
 
 	[ -n "$url_up" ] && cat <<- EOF
-	    <span class="LinkUp">
-	      <a href="$url_up">⇧ Up</a>
-	    </span
+	  <span class="LinkUp">
+	    <a href="$url_up">⇧ Up</a>
+	  </span
 	EOF
 
 	[ -n "$url_down" ] && cat <<- EOF
-	    <span class="LinkDown">
-	      <a href='$KOBUGI_INPUT' download>⇩ Download</a>
-	    </span
+	  <span class="LinkDown">
+	    <a href='$KOBUGI_INPUT' download>⇩ Download</a>
+	  </span
 	EOF
 
 	cat <<- EOF
-	  </div>
 	</nav>
+	</div>
 	EOF
 }
 
