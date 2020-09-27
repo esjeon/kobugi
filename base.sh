@@ -38,7 +38,7 @@ header() {
 	url_up=''
 	url_down=''
 	case "$KOBUGI_CWD:$KOBUGI_OUTPUT" in
-		/:index.html) return ;;
+		/:index.html) ;;
 		*:index.html) url_up='../' ;;
 		*)
 			url_up='./'
@@ -49,6 +49,10 @@ header() {
 	esac
 
 	cat <<- EOF
+	<header>
+
+	<div id="HeaderLeftSlot"></div>
+
 	<div id="HeaderLinks">
 	<nav>
 	EOF
@@ -68,6 +72,10 @@ header() {
 	cat <<- EOF
 	</nav>
 	</div>
+
+	<div id="HeaderRightSlot"></div>
+
+	</header>
 	EOF
 }
 
