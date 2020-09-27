@@ -40,7 +40,7 @@ print_entry() {
 	# $3: description
 
 	cat <<- EOF
-	  <div class="IndexEntry">
+	  <div class="Entry">
 	    <span class="Name"><a href="$1">$2</a></span>
 	    <span class="Description">$3</span>
 	  </div>
@@ -92,7 +92,7 @@ print_rest() {
 	fi
 
 	cat <<- EOF
-	<div id="IndexEntries">
+	<div id="Index">
 	<nav>
 	EOF
 
@@ -106,7 +106,10 @@ print_rest() {
 					print_rest ;;
 
 				separator)
-					echo "  <hr/>" ;;
+					cat <<- EOF
+					  <hr class="Separator"/>
+					EOF
+					;;
 
 				text)
 					cat <<- EOF
