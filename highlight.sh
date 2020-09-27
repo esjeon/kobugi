@@ -13,8 +13,6 @@
 
 set -euf
 
-buf="$(mktemp)"
-
 class="hl l"
 prefix="L"
 
