@@ -84,7 +84,7 @@ print_rest() {
 {
 	if [ -f "$KOBUGI_INPUT" ]; then
 		cat <<- EOF
-			<div id="IndexHeader">
+			<div id="IndexContent">
 			$(cat "$KOBUGI_INPUT")
 			</div>
 
