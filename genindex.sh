@@ -18,6 +18,12 @@ set -eu
 
 tab='	'
 
+tmp="$(mktemp -d)"
+trap cleanup EXIT
+cleanup() {
+	rm -rf "$tmp"
+}
+
 verify_entry() {
 	# $1: name
 
@@ -41,6 +47,14 @@ print_entry() {
 	EOF
 }
 
+mark_entry() {
+	touch "${tmp}/${1}"
+}
+
+is_entry_marked() {
+	[ -f "${tmp}/${1}" ] || return 1
+}
+
 print_rest() {
 	# no arguments
 
@@ -48,6 +62,8 @@ print_rest() {
 		[ -d "$dir" ] || continue
 
 		name="${dir%/}"
+		is_entry_marked "$name" && continue
+
 		print_entry "$dir" "$name" ""
 	done
 
@@ -59,6 +75,8 @@ print_rest() {
 		fi
 
 		name="${html%.html}"
+		is_entry_marked "$name" && continue
+
 		print_entry "$html" "$name" ""
 	done
 }
@@ -107,8 +125,10 @@ print_rest() {
 					;;
 
 				entry)
-					verify_entry "$arg1"
-					print_entry "$arg1" "$arg2" "$arg3" ;;
+					verify_entry "$arg1" || continue
+					is_entry_marked "$arg1" && continue
+					print_entry "$arg1" "$arg2" "$arg3"
+					mark_entry "$arg1" ;;
 
 				link)
 					print_entry "$arg1" "$arg2" "$arg3" ;;
