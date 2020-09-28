@@ -97,7 +97,7 @@ print_rest() {
 	EOF
 
 	if [ -f kobugimap ]; then
-		cat kobugimap | while IFS="$tab" read -r arg0 arg1 arg2 arg3 arg4; do
+		cat kobugimap | while IFS="$tab" read arg0 arg1 arg2 arg3 arg4; do
 			case "$arg0" in
 				'') ;;
 				'#'*) ;;
