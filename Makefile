@@ -45,10 +45,12 @@ SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 ########## Utils ##########
 
+ifneq "$(TERM)" ""
 ifneq "$(wildcard /usr/bin/tput)" ""
 	_B:=$(shell tput bold)
 	_R:=$(shell tput sgr0)
 	_U:=$(shell tput smul)
+endif
 endif
 define PROGRESS
 	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
