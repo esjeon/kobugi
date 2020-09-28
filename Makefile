@@ -5,35 +5,32 @@ all:
 
 ifndef VERBOSE
 .SILENT:
-MAKE_NOPRINTDIR:=--no-print-directory
+SILENT:=--no-print-directory
 endif
 
 
-### Environments
+########## Environments ##########
 
 export KOBUGI_MK   := $(firstword $(MAKEFILE_LIST))
 export KOBUGI_LIB  := $(dir $(realpath $(KOBUGI_MK)))
-export KOBUGI_ROOT := $(realpath $(shell dirname "$(KOBUGI_MK)"))
+export KOBUGI_ROOT := $(realpath $(dir $(KOBUGI_MK)))
 export KOBUGI_CWD  := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 export KOBUGI_INPUT  = $<
 export KOBUGI_OUTPUT = $@
 
 
-### Configs
+########## Configs ##########
 
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 
-
-### Config Adjustment
-
-ifeq "$(MAKELEVEL)" "0"
+ifeq "$(realpath $(CURDIR))" "$(KOBUGI_ROOT)"
 EXCLUDE_PATTERN := $(EXCLUDE_PATTERN) kobugi.mk Makefile
 endif
 
 
-### Files
+########## Files ##########
 
 EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
 PAGES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
@@ -46,7 +43,7 @@ OPT_KOBUGIMAP := $(wildcard kobugimap)
 SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
 
 
-### Tools
+########## Utils ##########
 
 ifneq "$(wildcard /usr/bin/tput)" ""
 	_B:=$(shell tput bold)
@@ -58,7 +55,7 @@ define PROGRESS
 endef
 
 
-### Commands
+########## Commands ##########
 
 all: $(SUBDIR) $(HTMLS) index.html
 
@@ -85,34 +82,14 @@ env:
 	@echo
 
 $(SUBDIR)::
-	make -C "$@" -f "../$(KOBUGI_MK)" $(MAKE_NOPRINTDIR) $(MAKECMDGOALS)
+	make -C "$@" -f "../$(KOBUGI_MK)" $(SILENT) $(MAKECMDGOALS)
 
 
-### Recipe - Index
-
-index.html: index.htmp
-	$(PROGRESS) IDX
-	$(BASE_RECIPE)
-
-.INTERMEDIATE: index.htmp $(OPT_INDEXHTMP)
-index.htmp: KOBUGI_INPUT=$(OPT_INDEXHTMP)
-index.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
-	$(PROGRESS) IDX
-	"$(KOBUGI_LIB)/genindex.sh"
-
-
-### Recipe - Page
+########## Rules ##########
 
 %.html: %.htmp
 	$(PROGRESS) TPL
 	$(BASE_RECIPE)
-
-define PAGE_RULE
-%.html: %.$(1).htmp
-	$$(PROGRESS) REN
-	$$(BASE_RECIPE)
-endef
-$(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
 
 %.htm.htmp: %.htm
 	$(PROGRESS) DOC
@@ -126,8 +103,22 @@ $(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
 	$(PROGRESS) MD
 	$(MARKDOWN_RECIPE)
 
+index.html: index.htmp
 
-### Recipe - View
+.INTERMEDIATE: index.htmp $(OPT_INDEXHTMP)
+index.htmp: KOBUGI_INPUT=$(OPT_INDEXHTMP)
+index.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
+	$(PROGRESS) IDX
+	"$(KOBUGI_LIB)/genindex.sh"
+
+
+define PAGE_RULE
+%.html: %.$(1).htmp
+	$$(PROGRESS) REN
+	$$(BASE_RECIPE)
+endef
+$(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
+
 
 define CODE_RULE
 .INTERMEDIATE: $(1).htmp
@@ -135,7 +126,5 @@ $(1).htmp: $(1)
 	$$(PROGRESS) HGT
 	$$(HIGHLIGHT_RECIPE)
 endef
-
 $(foreach ext, $(subst *,%,$(CODE_PATTERN)),\
 	$(eval $(call CODE_RULE,$(ext))))
-
