@@ -22,6 +22,12 @@ export KOBUGI_OUTPUT = $@
 
 ########## Configs ##########
 
+ifeq "$(MAKELEVEL)" "0"
+ifeq "$(wildcard kobugi.mk)" ""
+$(error 'kobugi.mk' doesn't exist. Exiting...)
+endif
+endif
+
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 
