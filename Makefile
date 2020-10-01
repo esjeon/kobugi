@@ -3,6 +3,11 @@
 # force set the main target to `all`
 all:
 
+KOBUGI_ROOT ?= $(CURDIR)
+ifeq "$(wildcard $(KOBUGI_ROOT)/kobugi.mk)" ""
+$(error $(KOBUGI_ROOT)/kobugi.mk doesn't exist.)
+endif
+
 ifndef VERBOSE
 .SILENT:
 SILENT:=--no-print-directory
@@ -11,10 +16,11 @@ endif
 
 ########## Environments ##########
 
-export KOBUGI_MK   := $(firstword $(MAKEFILE_LIST))
-export KOBUGI_LIB  := $(dir $(realpath $(KOBUGI_MK)))
-export KOBUGI_ROOT := $(realpath $(dir $(KOBUGI_MK)))
-export KOBUGI_CWD  := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
+export KOBUGI_ROOT := $(realpath $(KOBUGI_ROOT))
+export KOBUGI_CWD := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
+
+export KOBUGI_MAKEFILE := $(realpath $(firstword $(MAKEFILE_LIST)))
+export KOBUGI_LIB := $(dir $(KOBUGI_MAKEFILE))
 
 export KOBUGI_INPUT  = $<
 export KOBUGI_OUTPUT = $@
@@ -22,16 +28,10 @@ export KOBUGI_OUTPUT = $@
 
 ########## Configs ##########
 
-ifeq "$(MAKELEVEL)" "0"
-ifeq "$(wildcard kobugi.mk)" ""
-$(error 'kobugi.mk' doesn't exist. Exiting...)
-endif
-endif
-
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 
-ifeq "$(realpath $(CURDIR))" "$(KOBUGI_ROOT)"
+ifeq "$(KOBUGI_CWD)" "/"
 EXCLUDE_PATTERN := $(EXCLUDE_PATTERN) kobugi.mk Makefile
 endif
 
@@ -90,7 +90,7 @@ env:
 	@echo
 
 $(SUBDIR)::
-	make -C "$@" -f "../$(KOBUGI_MK)" $(SILENT) $(MAKECMDGOALS)
+	make -C "$@" -f "$(KOBUGI_MAKEFILE)" $(SILENT) $(MAKECMDGOALS)
 
 
 ########## Rules ##########
