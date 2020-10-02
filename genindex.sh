@@ -8,12 +8,6 @@
 # * Output
 #   - ${KOBUGI_OUTPUT}: generated page
 #
-# * Related
-#   - /global.css: site-global stylesheet
-#   - local.css, local.js: local stylesheet and script
-#
-# This is the outer-most wrapper for any content in the site.
-#
 set -eu
 
 tab='	'
