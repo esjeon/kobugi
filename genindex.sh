@@ -42,15 +42,40 @@ normalize_name() {
 	fi
 }
 
+detect_class() {
+	# $1: VALID filename
+
+	if [ -d "$1" ]; then
+		echo "Dir"
+	else
+		case "$1" in
+			*.html) echo "Page" ;;
+			*) echo "Asset" ;;
+		esac
+	fi
+}
+
 print_entry() {
 	# $1: filename/URL
 	# $2: display name
 	# $3: description
+	# $4: class (Dir, Page, Asset, Link)
+	local url disp desc cls down
+	url="$1"
+	disp="${2:-$url}"
+	desc="$3"
+	cls=" $4"
+
+	if [ "$cls" = " Asset" ]; then
+		down=" download"
+	else
+		down=''
+	fi
 
 	cat <<- EOF
-	  <div class="Entry">
-	    <span class="Name"><a href="$1">$2</a></span>
-	    <span class="Description">$3</span>
+	  <div class="Entry${cls}">
+	    <span class="Name"><a href="${url}"${down}>${disp}</a></span>
+	    <span class="Description">${desc}</span>
 	  </div>
 	EOF
 }
@@ -73,7 +98,7 @@ print_rest() {
 		name="${dir%/}"
 		is_entry_marked "$name" && continue
 
-		print_entry "$dir" "$name" ""
+		print_entry "$dir" "$name" "" "Dir"
 	done
 
 	for html in *.html; do
@@ -85,7 +110,15 @@ print_rest() {
 
 		is_entry_marked "$html" && continue
 
-		print_entry "$html" "${html%.html}" ""
+		print_entry "$html" "${html%.html}" "" "Page"
+	done
+
+	for asset in ${KOBUGI_ASSETS}; do
+		[ -f "$asset" ] || continue
+
+		is_entry_marked "$asset" && continue
+
+		print_entry "$asset" "$asset" "" "Asset"
 	done
 }
 
@@ -142,11 +175,13 @@ print_rest() {
 					is_entry_marked "$name" && continue
 					mark_entry "$name"
 
-					print_entry "$name" "$arg2" "$arg3"
+					cls="$(detect_class "$name")"
+					print_entry "$name" "$arg2" "$arg3" "$cls"
 					;;
 
 				link)
-					print_entry "$arg1" "$arg2" "$arg3" ;;
+					print_entry "$arg1" "$arg2" "$arg3" "Link"
+					;;
 
 				*)
 					echo "wtf: $arg0/$arg1/$arg2/$arg3/$arg4" >&2 ;;
