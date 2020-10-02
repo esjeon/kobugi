@@ -195,4 +195,6 @@ print_rest() {
 	</nav>
 	</div>
 	EOF
-} > "${KOBUGI_OUTPUT}"
+} > "${tmp}/buf"
+
+mv "${tmp}/buf" "${KOBUGI_OUTPUT}"
