@@ -43,7 +43,8 @@ PAGES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
 CODES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
 
 HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
-OPT_INDEXHTMP := $(addsuffix .htmp,$(firstword $(wildcard $(INDEX))))
+
+OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX)))))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
 
 SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
@@ -99,34 +100,26 @@ $(SUBDIR)::
 	$(PROGRESS) TPL
 	$(BASE_RECIPE)
 
-%.htm.htmp: %.htm
+%.htmp: %.htm
 	$(PROGRESS) DOC
 	cp -l "$<" "$@"
 
-%.kbg.htmp: %.kbg
+%.htmp: %.kbg
 	$(PROGRESS) DOC
 	./"$<" > "$@"
 
-%.md.htmp: %.md
+%.htmp: %.md
 	$(PROGRESS) MD
 	$(MARKDOWN_RECIPE)
 
-index.html: index.htmp
+index.html: index.full.htmp
+	$(PROGRESS) TPL
+	$(BASE_RECIPE)
 
-.INTERMEDIATE: index.htmp $(OPT_INDEXHTMP)
-index.htmp: KOBUGI_INPUT=$(OPT_INDEXHTMP)
-index.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
+.INTERMEDIATE: index.full.htmp $(OPT_INDEXHTMP)
+index.full.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
 	$(PROGRESS) IDX
-	"$(KOBUGI_LIB)/genindex.sh"
-
-
-define PAGE_RULE
-%.html: %.$(1).htmp
-	$$(PROGRESS) REN
-	$$(BASE_RECIPE)
-endef
-$(foreach ext, htm kbg md, $(eval $(call PAGE_RULE,$(ext))))
-
+	KOBUGI_INPUT="$(OPT_INDEXHTMP)" "$(KOBUGI_LIB)/genindex.sh"
 
 define CODE_RULE
 .INTERMEDIATE: $(1).htmp
