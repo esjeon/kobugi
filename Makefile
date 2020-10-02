@@ -25,6 +25,9 @@ export KOBUGI_LIB := $(dir $(KOBUGI_MAKEFILE))
 export KOBUGI_INPUT  = $<
 export KOBUGI_OUTPUT = $@
 
+# Placeholder. The actual value comes from config file.
+export KOBUGI_ASSETS :=
+
 
 ########## Configs ##########
 
@@ -48,6 +51,8 @@ OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX))))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
 
 SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
+
+KOBUGI_ASSETS := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard ASSET_PATTERN))
 
 
 ########## Utils ##########

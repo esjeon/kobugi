@@ -1,6 +1,7 @@
 
 PAGE_PATTERN := *.kbg *.htm *.md
 CODE_PATTERN :=
+ASSET_PATTERN :=
 EXCLUDE_PATTERN := local.* global.*
 
 INDEX := index.kbg index.htm index.md README.md

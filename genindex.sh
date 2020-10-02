@@ -3,6 +3,7 @@
 #
 # * Input
 #   - ${KOBUGI_INPUT}: content
+#   - ${KOBUGI_ASSETS}: list of asset files in CWD
 #   - ./kobugimap: index entries
 #
 # * Output
