@@ -18,18 +18,32 @@ cleanup() {
 	rm -rf "$tmp"
 }
 
-verify_entry() {
+# Print the actual file name of the given "entry" to stdout.
+#
+# An entry can be either:
+#   - a directory named "$entry"
+#   - a file named "$entry"
+#   - a page named "${entry}.html"
+#
+# If the given entry is invalid, nothing will be printed.
+normalize_name() {
 	# $1: name
 
 	case "$1" in
-		*/*) return 1 ;;
+		*/*) return ;;
 	esac
 
-	[ -d "$1" ] || [ -f "$1.html" ] || return 1
+	if [ -d "$1" ]; then
+		echo "$1"
+	elif [ -f "$1" ]; then
+		echo "$1"
+	elif [ -f "$1.html" ]; then
+		echo "$1.html"
+	fi
 }
 
 print_entry() {
-	# $1: file/URL
+	# $1: filename/URL
 	# $2: display name
 	# $3: description
 
@@ -51,6 +65,7 @@ is_entry_marked() {
 
 print_rest() {
 	# no arguments
+	local name
 
 	for dir in */; do
 		[ -d "$dir" ] || continue
@@ -68,10 +83,9 @@ print_rest() {
 			continue
 		fi
 
-		name="${html%.html}"
-		is_entry_marked "$name" && continue
+		is_entry_marked "$html" && continue
 
-		print_entry "$html" "$name" ""
+		print_entry "$html" "${html%.html}" ""
 	done
 }
 
@@ -122,10 +136,14 @@ print_rest() {
 					;;
 
 				entry)
-					verify_entry "$arg1" || continue
-					is_entry_marked "$arg1" && continue
-					print_entry "$arg1" "$arg2" "$arg3"
-					mark_entry "$arg1" ;;
+					name="$(normalize_name $arg1)"
+					[ -z "$name" ] && exit 1
+
+					is_entry_marked "$name" && continue
+					mark_entry "$name"
+
+					print_entry "$name" "$arg2" "$arg3"
+					;;
 
 				link)
 					print_entry "$arg1" "$arg2" "$arg3" ;;
