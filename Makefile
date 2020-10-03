@@ -17,7 +17,7 @@ endif
 ########## Environments ##########
 
 export KOBUGI_ROOT := $(realpath $(KOBUGI_ROOT))
-export KOBUGI_CWD := $(abspath $(CURDIR:$(KOBUGI_ROOT)%=%)/)
+export KOBUGI_CWD := $(abspath /$(CURDIR:$(KOBUGI_ROOT)%=%)/)
 
 export KOBUGI_MAKEFILE := $(realpath $(firstword $(MAKEFILE_LIST)))
 export KOBUGI_LIB := $(dir $(KOBUGI_MAKEFILE))
