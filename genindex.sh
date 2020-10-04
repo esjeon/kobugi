@@ -94,8 +94,6 @@ print_rest() {
 	local name
 
 	for dir in ${KOBUGI_DIRS}; do
-		[ -d "$dir" ] || continue
-
 		name="${dir%/}"
 		is_entry_marked "$name" && continue
 
@@ -103,8 +101,6 @@ print_rest() {
 	done
 
 	for html in ${KOBUGI_HTMLS}; do
-		[ -f "$html" ] || continue
-
 		if [ "$html" = 'index.html' ]; then
 			continue
 		fi
@@ -115,8 +111,6 @@ print_rest() {
 	done
 
 	for asset in ${KOBUGI_ASSETS}; do
-		[ -f "$asset" ] || continue
-
 		is_entry_marked "$asset" && continue
 
 		print_entry "$asset" "$asset" "" "Asset"
