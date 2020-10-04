@@ -69,6 +69,8 @@ endef
 .PHONY: all clean vars $(KOBUGI_DIRS)
 
 all: $(KOBUGI_DIRS) $(KOBUGI_HTMLS) index.html
+	-chmod 644 *.html 2>&- >&-
+	-chmod 600 *.htmp 2>&- >&-
 
 clean: $(KOBUGI_DIRS)
 	rm -f *.html *.htmp
