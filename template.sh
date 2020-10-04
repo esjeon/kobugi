@@ -1,5 +1,5 @@
 #!/bin/dash
-# template-base.sh - The base plate for the entire site
+# template.sh - The default template for Kobugi
 #
 # * Input
 #   - env KOBUGI_*: the Kobugi interface

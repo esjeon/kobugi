@@ -89,9 +89,9 @@ $(KOBUGI_DIRS)::
 
 ########## Rules ##########
 
-%.html: %.htmp kobugimap.htmp
+%.html: %.htmp kobugimap.htmp $(TEMPLATE)
 	$(PROGRESS) TPL
-	$(BASE_RECIPE)
+	$(TEMPLATE)
 
 %.htmp: %.htm
 	$(PROGRESS) DOC
@@ -105,9 +105,9 @@ $(KOBUGI_DIRS)::
 	$(PROGRESS) MD
 	$(MARKDOWN_RECIPE)
 
-index.html: $(OPT_INDEXHTMP) kobugimap.htmp
+index.html: $(OPT_INDEXHTMP) kobugimap.htmp $(TEMPLATE)
 	$(PROGRESS) TPL
-	KOBUGI_INPUT="$(OPT_INDEXHTMP)" $(BASE_RECIPE)
+	KOBUGI_INPUT="$(OPT_INDEXHTMP)" $(TEMPLATE)
 
 .INTERMEDIATE: kobugimap.htmp
 kobugimap.htmp: $(OPT_KOBUGIMAP)

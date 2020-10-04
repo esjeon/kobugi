@@ -35,9 +35,7 @@ KOBUGI_DIRS  := $(filter-out $(IGNORE), $(KOBUGI_DIRS))
 #
 INDEX := index.kbg index.htm index.md README.md
 
-define BASE_RECIPE
-$(KOBUGI_LIB)/base.sh
-endef
+TEMPLATE := $(KOBUGI_LIB)/template.sh
 
 define MARKDOWN_RECIPE
 	echo '<content>' > '$@'
