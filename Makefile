@@ -111,7 +111,6 @@ index.html: $(OPT_INDEXHTMP) kobugimap.htmp $(TEMPLATE)
 	$(PROGRESS) TPL
 	KOBUGI_INPUT="$(OPT_INDEXHTMP)" $(TEMPLATE)
 
-.INTERMEDIATE: kobugimap.htmp
 kobugimap.htmp: $(OPT_KOBUGIMAP)
 	$(PROGRESS) IDX
 	"$(KOBUGI_LIB)/parse-kobugimap.sh"
