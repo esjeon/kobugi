@@ -62,6 +62,8 @@ endef
 
 ########## Commands ##########
 
+.PHONY: all clean vars $(KOBUGI_DIRS)
+
 all: $(KOBUGI_DIRS) $(HTMLS) index.html
 
 clean: $(KOBUGI_DIRS)
