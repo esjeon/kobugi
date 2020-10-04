@@ -9,7 +9,7 @@
 # * Output
 #   - ${KOBUGI_OUTPUT}: generated page
 #
-set -eu
+set -euf
 
 tab='	'
 
@@ -93,7 +93,7 @@ print_rest() {
 	# no arguments
 	local name
 
-	for dir in */; do
+	for dir in ${KOBUGI_DIRS}; do
 		[ -d "$dir" ] || continue
 
 		name="${dir%/}"
@@ -102,7 +102,7 @@ print_rest() {
 		print_entry "$dir" "$name" "" "Dir"
 	done
 
-	for html in *.html; do
+	for html in ${KOBUGI_HTMLS}; do
 		[ -f "$html" ] || continue
 
 		if [ "$html" = 'index.html' ]; then
