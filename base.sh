@@ -3,7 +3,8 @@
 #
 # * Input
 #   - env KOBUGI_*: the Kobugi interface
-#   - ${KOBUGI_INPUT}: content
+#   - ${KOBUGI_INPUT}: page content
+#   - kobugimap(.htmp): (optional) directory entries
 #
 # * Output
 #   - ${KOBUGI_OUTPUT}: generated page
@@ -15,7 +16,7 @@
 # This is the outer-most wrapper for any content in the site.
 #
 
-set -e
+set -euf
 
 if [ -z "$KOBUGI_CWD" ]; then
 	echo "This script can't run independently." >&2
@@ -79,10 +80,6 @@ header() {
 	EOF
 }
 
-body () {
-	cat "$KOBUGI_INPUT"
-}
-
 footer() {
 	cat <<- EOF
 	<footer>
@@ -91,8 +88,9 @@ footer() {
 	EOF
 }
 
+{
 
-cat > "$tmp" << EOF
+cat <<- EOF
 <!DOCTYPE html>
 <html>
 <head>
@@ -112,10 +110,30 @@ cat > "$tmp" << EOF
 $(header)
 </div>
 
-<div id="Main">
-$(body)
-</div>
+EOF
 
+if [ -f "$KOBUGI_INPUT" ]; then
+	cat <<- EOF
+	<div id="Main">
+	$(cat "$KOBUGI_INPUT")
+	</div>
+
+	EOF
+fi
+
+# TODO: use environment variable for the filename of the map?
+if [ "$KOBUGI_OUTPUT" = 'index.html' -a -f kobugimap.htmp ]; then
+	cat <<- EOF
+	<div id="Index">
+	<nav>
+	$(cat kobugimap.htmp)
+	</nav>
+	</div>
+
+	EOF
+fi
+
+cat <<- EOF
 <div id="Footer">
 $(footer)
 </div>
@@ -124,5 +142,7 @@ $(footer)
 </body>
 </html>
 EOF
+
+} > "$tmp"
 
 mv "$tmp" "$KOBUGI_OUTPUT"

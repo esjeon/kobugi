@@ -47,6 +47,7 @@ KOBUGI_HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(KOBUGI_
 
 OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX)))))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
+OPT_KOBUGIMAP_HTMP := $(addsuffix .htmp, $(OPT_KOBUGIMAP))
 
 
 ########## Utils ##########
@@ -88,7 +89,7 @@ $(KOBUGI_DIRS)::
 
 ########## Rules ##########
 
-%.html: %.htmp
+%.html: %.htmp kobugimap.htmp
 	$(PROGRESS) TPL
 	$(BASE_RECIPE)
 
@@ -104,14 +105,14 @@ $(KOBUGI_DIRS)::
 	$(PROGRESS) MD
 	$(MARKDOWN_RECIPE)
 
-index.html: index.full.htmp
+index.html: $(OPT_INDEXHTMP) kobugimap.htmp
 	$(PROGRESS) TPL
 	$(BASE_RECIPE)
 
-.INTERMEDIATE: index.full.htmp $(OPT_INDEXHTMP)
-index.full.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(KOBUGI_HTMLS)
+.INTERMEDIATE: kobugimap.htmp
+kobugimap.htmp: $(OPT_KOBUGIMAP)
 	$(PROGRESS) IDX
-	KOBUGI_INPUT="$(OPT_INDEXHTMP)" "$(KOBUGI_LIB)/genindex.sh"
+	"$(KOBUGI_LIB)/genindex.sh"
 
 define CODE_RULE
 .INTERMEDIATE: $(1).htmp

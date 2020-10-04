@@ -2,7 +2,6 @@
 # genindex.sh - generate index entries based on kobugimap
 #
 # * Input
-#   - ${KOBUGI_INPUT}: content
 #   - ${KOBUGI_ASSETS}: list of asset files in CWD
 #   - ./kobugimap: index entries
 #
@@ -119,21 +118,7 @@ print_rest() {
 
 {
 	if [ -f "$KOBUGI_INPUT" ]; then
-		cat <<- EOF
-			<div id="IndexContent">
-			$(cat "$KOBUGI_INPUT")
-			</div>
-
-		EOF
-	fi
-
-	cat <<- EOF
-	<div id="Index">
-	<nav>
-	EOF
-
-	if [ -f kobugimap ]; then
-		cat kobugimap | while IFS="$tab" read arg0 arg1 arg2 arg3 arg4; do
+		cat "$KOBUGI_INPUT" | while IFS="$tab" read arg0 arg1 arg2 arg3 arg4; do
 			case "$arg0" in
 				'') ;;
 				'#'*) ;;
@@ -185,11 +170,6 @@ print_rest() {
 	else
 		print_rest
 	fi
-
-	cat <<- EOF
-	</nav>
-	</div>
-	EOF
 } > "${tmp}/buf"
 
 mv "${tmp}/buf" "${KOBUGI_OUTPUT}"
