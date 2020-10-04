@@ -26,7 +26,10 @@ export KOBUGI_INPUT  = $<
 export KOBUGI_OUTPUT = $@
 
 # Placeholder. The actual value comes from config file.
-export KOBUGI_ASSETS :=
+export KOBUGI_PAGES := $(wildcard *.kbg *.htm *.md)
+export KOBUGI_VIEWS :=
+export KOBUGI_DIRS := $(subst /,,$(shell ls -d */ 2>/dev/null))
+export KOBUGI_ASSETS := 
 
 
 ########## Configs ##########
@@ -34,25 +37,13 @@ export KOBUGI_ASSETS :=
 include $(KOBUGI_ROOT)/kobugi.mk
 -include local.mk
 
-ifeq "$(KOBUGI_CWD)" "/"
-EXCLUDE_PATTERN := $(EXCLUDE_PATTERN) kobugi.mk Makefile
-endif
-
 
 ########## Files ##########
 
-EXCLUDE_PATTERN := $(subst *,%,$(EXCLUDE_PATTERN))
-PAGES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(PAGE_PATTERN)))
-CODES := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard $(CODE_PATTERN)))
-
-HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(PAGES)) $(CODES)))
+HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(KOBUGI_PAGES)) $(KOBUGI_VIEWS)))
 
 OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX)))))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
-
-SUBDIR := $(subst /,,$(shell ls -d */ 2>/dev/null))
-
-KOBUGI_ASSETS := $(filter-out $(EXCLUDE_PATTERN) $(INDEX), $(wildcard ASSET_PATTERN))
 
 
 ########## Utils ##########
@@ -71,31 +62,23 @@ endef
 
 ########## Commands ##########
 
-all: $(SUBDIR) $(HTMLS) index.html
+all: $(KOBUGI_DIRS) $(HTMLS) index.html
 
-clean: $(SUBDIR)
+clean: $(KOBUGI_DIRS)
 	rm -f *.html *.htmp
-
-config:
-	@echo "PAGE_PATTERN    = $(PAGE_PATTERN)"
-	@echo "CODE_PATTERN    = $(CODE_PATTERN)"
-	@echo "EXCLUDE_PATTERN = $(EXCLUDE_PATTERN)"
-	@echo "INDEX           = $(INDEX)"
 
 vars:
 	@echo "This output is for debugging only."
 	@echo
-	@echo "SUBDIR = $(SUBDIR)"
-	@echo "PAGES = $(PAGES)"
-	@echo "CODES = $(CODES)"
+	@echo "INDEX           = $(INDEX)"
+	@echo
 	@echo "HTMLS = $(HTMLS)"
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
-
-env:
-	@env | grep KOBUGI_
+	@echo
+	@env | grep ^KOBUGI_ | sed 's/=/\t= /'
 	@echo
 
-$(SUBDIR)::
+$(KOBUGI_DIRS)::
 	make -C "$@" -f "$(KOBUGI_MAKEFILE)" $(SILENT) $(MAKECMDGOALS)
 
 
