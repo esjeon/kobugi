@@ -25,11 +25,14 @@ export KOBUGI_LIB := $(dir $(KOBUGI_MAKEFILE))
 export KOBUGI_INPUT  = $<
 export KOBUGI_OUTPUT = $@
 
-# Placeholder. The actual value comes from config file.
+# Configurables
 export KOBUGI_PAGES := $(wildcard *.kbg *.htm *.md)
 export KOBUGI_VIEWS :=
 export KOBUGI_DIRS := $(subst /,,$(shell ls -d */ 2>/dev/null))
 export KOBUGI_ASSETS := 
+
+# Placeholders
+export KOBUGI_HTMLS :=
 
 
 ########## Configs ##########
@@ -40,7 +43,7 @@ include $(KOBUGI_ROOT)/kobugi.mk
 
 ########## Files ##########
 
-HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(KOBUGI_PAGES)) $(KOBUGI_VIEWS)))
+KOBUGI_HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(KOBUGI_PAGES)) $(KOBUGI_VIEWS)))
 
 OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX)))))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
@@ -64,7 +67,7 @@ endef
 
 .PHONY: all clean vars $(KOBUGI_DIRS)
 
-all: $(KOBUGI_DIRS) $(HTMLS) index.html
+all: $(KOBUGI_DIRS) $(KOBUGI_HTMLS) index.html
 
 clean: $(KOBUGI_DIRS)
 	rm -f *.html *.htmp
@@ -74,7 +77,6 @@ vars:
 	@echo
 	@echo "INDEX           = $(INDEX)"
 	@echo
-	@echo "HTMLS = $(HTMLS)"
 	@echo "OPT_INDEXHTMP = $(OPT_INDEXHTMP)"
 	@echo
 	@env | grep ^KOBUGI_ | sed 's/=/\t= /'
@@ -107,7 +109,7 @@ index.html: index.full.htmp
 	$(BASE_RECIPE)
 
 .INTERMEDIATE: index.full.htmp $(OPT_INDEXHTMP)
-index.full.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(HTMLS)
+index.full.htmp: $(OPT_INDEXHTMP) $(OPT_KOBUGIMAP) | $(KOBUGI_HTMLS)
 	$(PROGRESS) IDX
 	KOBUGI_INPUT="$(OPT_INDEXHTMP)" "$(KOBUGI_LIB)/genindex.sh"
 
