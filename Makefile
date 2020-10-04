@@ -45,7 +45,7 @@ include $(KOBUGI_ROOT)/kobugi.mk
 
 KOBUGI_HTMLS := $(filter-out index.html, $(addsuffix .html, $(basename $(KOBUGI_PAGES)) $(KOBUGI_VIEWS)))
 
-OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(firstword $(wildcard $(INDEX)))))
+OPT_INDEXHTMP := $(addsuffix .htmp,$(basename $(INDEX)))
 OPT_KOBUGIMAP := $(wildcard kobugimap)
 OPT_KOBUGIMAP_HTMP := $(addsuffix .htmp, $(OPT_KOBUGIMAP))
 

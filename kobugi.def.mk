@@ -33,7 +33,7 @@ KOBUGI_DIRS  := $(filter-out $(IGNORE), $(KOBUGI_DIRS))
 # The name(s) of directory index file. Ealier the name appears, higher the
 # priority is.
 #
-INDEX := index.kbg index.htm index.md README.md
+INDEX := $(firstword $(wildcard index.kbg index.htm index.md README.md))
 
 TEMPLATE := $(KOBUGI_LIB)/template.sh
 
