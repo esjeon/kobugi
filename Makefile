@@ -107,7 +107,7 @@ $(KOBUGI_DIRS)::
 
 index.html: $(OPT_INDEXHTMP) kobugimap.htmp
 	$(PROGRESS) TPL
-	$(BASE_RECIPE)
+	KOBUGI_INPUT="$(OPT_INDEXHTMP)" $(BASE_RECIPE)
 
 .INTERMEDIATE: kobugimap.htmp
 kobugimap.htmp: $(OPT_KOBUGIMAP)
