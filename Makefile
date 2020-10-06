@@ -60,7 +60,7 @@ ifneq "$(wildcard /usr/bin/tput)" ""
 endif
 endif
 define PROGRESS
-	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R): $?\n"
+	@printf " $(_B)[%3s]$(_R) $(KOBUGI_CWD:%/=%)/$(_U)$(_B)$@$(_R)\n"
 endef
 
 
