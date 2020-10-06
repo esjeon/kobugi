@@ -115,7 +115,9 @@ EOF
 if [ -f "$KOBUGI_INPUT" ]; then
 	cat <<- EOF
 	<div id="Main">
+	<content>
 	$(cat "$KOBUGI_INPUT")
+	</content>
 	</div>
 
 	EOF

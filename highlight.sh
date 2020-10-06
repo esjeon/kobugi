@@ -16,10 +16,7 @@ set -euf
 class="hl l"
 prefix="L"
 
-count=''
-
 {
-	echo "<content>"
 	highlight --replace-tabs=4 --no-doc --enclose-pre "$KOBUGI_INPUT" |
 	cat -n |
 	sed "$( cat <<- EOF
@@ -30,5 +27,4 @@ count=''
 		s/^\s*\([0-9]\+\)\t\(.*\)$/<span class="${class}" id="${prefix}_\1">\2<\\/span>/
 	EOF
 	)"
-	echo "</content>"
 } > "$KOBUGI_OUTPUT"

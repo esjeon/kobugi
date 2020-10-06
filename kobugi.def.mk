@@ -38,9 +38,7 @@ INDEX := $(firstword $(wildcard index.kbg index.htm index.md README.md))
 TEMPLATE := $(KOBUGI_LIB)/template.sh
 
 define MARKDOWN_RECIPE
-	echo '<content>' > '$@'
-	cmark "$<" >> '$@'
-	echo '</content>' >> '$@'
+	cmark "$<" > '$@'
 endef
 
 define HIGHLIGHT_RECIPE
