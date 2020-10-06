@@ -97,6 +97,7 @@ $(KOBUGI_DIRS)::
 
 %.htmp: %.htm
 	$(PROGRESS) DOC
+	rm -f "$@"
 	cp -l "$<" "$@"
 
 %.htmp: %.kbg
