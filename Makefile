@@ -74,6 +74,7 @@ all: $(KOBUGI_DIRS) $(KOBUGI_HTMLS) index.html
 
 clean: $(KOBUGI_DIRS)
 	rm -f *.html *.htmp
+	[ -n "$(KOBUGI_DIRS)" ] && rmdir $(KOBUGI_DIRS) 2>/dev/null || true
 
 vars:
 	@echo "This output is for debugging only."
