@@ -92,14 +92,14 @@ print_rest() {
 	# no arguments
 	local name
 
-	for dir in ${KOBUGI_DIRS}; do
+	echo "$KOBUGI_DIRS" | tr ' ' '\n' | sort -g | while read dir; do
 		name="${dir%/}"
 		is_entry_marked "$name" && continue
 
 		print_entry "$dir" "$name" "" "Dir"
 	done
 
-	for html in ${KOBUGI_HTMLS}; do
+	echo "${KOBUGI_HTMLS}" | tr ' ' '\n' | sort -g | while read html; do
 		if [ "$html" = 'index.html' ]; then
 			continue
 		fi
@@ -109,7 +109,7 @@ print_rest() {
 		print_entry "$html" "${html%.html}" "" "Page"
 	done
 
-	for asset in ${KOBUGI_ASSETS}; do
+	echo "${KOBUGI_ASSETS}" | tr ' ' '\n' | sort -g | while read asset; do
 		is_entry_marked "$asset" && continue
 
 		print_entry "$asset" "$asset" "" "Asset"
