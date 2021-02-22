@@ -1,5 +1,5 @@
 #!/bin/dash
-# parse-kobugimap.sh - generate index entries based on kobugimap
+# render-kobugimap.sh - generate index entries from kobugimap
 #
 # * Input
 #   - ${KOBUGI_ASSETS}: list of asset files in CWD

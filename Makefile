@@ -115,7 +115,7 @@ index.html: $(OPT_INDEXHTMP) kobugimap.htmp $(TEMPLATE)
 
 kobugimap.htmp: $(OPT_KOBUGIMAP)
 	$(PROGRESS) IDX
-	"$(KOBUGI_LIB)/parse-kobugimap.sh"
+	"$(KOBUGI_LIB)/render-kobugimap.sh"
 
 define CODE_RULE
 .INTERMEDIATE: $(1).htmp
